@@ -101,12 +101,12 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
             />
           </div>
 
-          <div className="flex items-center justify-between gap-4">
-             <div className="flex p-1 bg-background/80 rounded-xl border border-border-color shadow-sm">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+             <div className="flex p-1 bg-background/80 rounded-xl border border-border-color shadow-sm w-full sm:w-auto">
                 <button 
                   type="button"
                   onClick={() => setNoteType('note')}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
+                  className={`flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
                     noteType === 'note' ? 'bg-accent-blue text-white shadow-lg shadow-accent-blue/20' : 'text-gray-text hover:text-foreground'
                   }`}
                 >
@@ -115,7 +115,7 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
                 <button 
                   type="button"
                   onClick={() => setNoteType('event')}
-                  className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
+                  className={`flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
                     noteType === 'event' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'text-gray-text hover:text-foreground'
                   }`}
                 >
@@ -126,7 +126,7 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
              <button 
                 type="submit"
                 disabled={!activeDate || !localText.trim()}
-                className="flex items-center gap-2 px-6 py-2 bg-accent-blue hover:bg-accent-blue/90 disabled:opacity-20 disabled:hover:bg-accent-blue text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-accent-blue/20 active:scale-95"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2 bg-accent-blue hover:bg-accent-blue/90 disabled:opacity-20 disabled:hover:bg-accent-blue text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-accent-blue/20 active:scale-95"
              >
                 {isSaved ? <CheckCircle2 size={16} /> : <Send size={16} />}
                 {isSaved ? 'SAVED' : 'SAVE'}

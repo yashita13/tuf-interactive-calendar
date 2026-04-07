@@ -38,7 +38,7 @@ export function Hero() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="mb-8 px-5 py-2 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-[10px] md:text-xs font-black uppercase tracking-[0.3em] flex items-center gap-3 shadow-inner shadow-accent-blue/5"
+            className="mb-8 px-5 py-2 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-[10px] md:text-xs font-black uppercase tracking-[0.3em] hidden md:flex items-center gap-3 shadow-inner shadow-accent-blue/5"
           >
             <div className="w-1.5 h-1.5 rounded-full bg-accent-blue animate-pulse shadow-lg shadow-accent-blue/50" />
             V0.2 • Immersive Timeline Alpha
@@ -87,7 +87,7 @@ export function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.8, duration: 1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-gray-text flex flex-col items-center gap-3 cursor-pointer group"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-gray-text hidden md:flex flex-col items-center gap-3 cursor-pointer group"
         onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
       >
         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-blue/40 group-hover:text-accent-blue transition-colors">Scroll to explore</span>

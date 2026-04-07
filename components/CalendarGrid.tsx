@@ -65,7 +65,7 @@ export function CalendarGrid({ calendar, notesStore }: CalendarGridProps) {
       </div>
 
       {/* WeekDays grid */}
-      <div className="grid grid-cols-7 gap-2 sm:gap-4 mb-4 border-b border-border-color pb-4 transition-colors duration-500">
+      <div className="grid grid-cols-7 gap-1 sm:gap-4 mb-4 border-b border-border-color pb-4 transition-colors duration-500">
         {WEEKDAYS.map((day, ix) => (
           <div 
             key={day} 

@@ -23,7 +23,7 @@ export function DayCell({ date, status, hasNotes, hasEvents, onClick }: DayCellP
 
   if (!isCurrentMonth) {
     return (
-      <div className="h-11 w-11 md:h-12 md:w-12 flex items-center justify-center text-gray-text/10 text-sm md:text-base font-bold pointer-events-none transition-colors duration-500">
+      <div className="h-9 w-9 md:h-12 md:w-12 flex items-center justify-center text-gray-text/10 text-sm md:text-base font-bold pointer-events-none transition-colors duration-500">
         {format(date, 'd')}
       </div>
     );
@@ -41,7 +41,7 @@ export function DayCell({ date, status, hasNotes, hasEvents, onClick }: DayCellP
       whileTap={{ scale: 0.92 }}
       onClick={() => onClick(date)}
       className={cn(
-        "relative h-11 w-11 md:h-12 md:w-12 flex items-center justify-center text-sm md:text-base font-bold transition-all duration-300 rounded-xl",
+        "relative h-9 w-9 md:h-12 md:w-12 flex items-center justify-center text-sm md:text-base font-bold transition-all duration-300 rounded-xl",
         "outline-none focus:ring-2 focus:ring-accent-blue/40",
          !isSelected && !isSelectedRange && "hover:bg-accent-blue/5 hover:text-accent-blue",
         
