@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { 
   addMonths, subMonths, startOfMonth, endOfMonth, 
   startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth,
-  isSameDay, isWithinInterval, isBefore, max, min
+  isSameDay, isWithinInterval, differenceInDays, max, min, 
+  setMonth as setDateMonth, setYear as setDateYear
 } from 'date-fns';
 
 export type SelectionRange = {
@@ -16,34 +17,48 @@ export function useCalendar(initialDate: Date = new Date()) {
 
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
+  const goToToday = () => {
+    const today = new Date();
+    setCurrentDate(today);
+    setSelection({ start: today, end: null });
+  };
 
-  const getDaysInMonth = () => {
+  const setMonth = (month: number) => setCurrentDate(setDateMonth(currentDate, month));
+  const setYear = (year: number) => setCurrentDate(setDateYear(currentDate, year));
+
+  const getDaysInMonth = useMemo(() => {
     const start = startOfWeek(startOfMonth(currentDate));
     const end = endOfWeek(endOfMonth(currentDate));
     return eachDayOfInterval({ start, end });
-  };
+  }, [currentDate]);
+
+  const selectionStats = useMemo(() => {
+    if (!selection.start) return null;
+    if (!selection.end) return { start: selection.start, end: selection.start, days: 1 };
+    
+    return {
+      start: selection.start,
+      end: selection.end,
+      days: differenceInDays(selection.end, selection.start) + 1
+    };
+  }, [selection]);
 
   const handleDateSelect = useCallback((date: Date) => {
     setSelection(prev => {
-      // If nothing is selected, select start
       if (!prev.start) {
         return { start: date, end: null };
       }
       
-      // If start is selected but no end
       if (prev.start && !prev.end) {
-        // If they click the same date, unselect it
         if (isSameDay(date, prev.start)) {
           return { start: null, end: null };
         }
         
-        // Ensure start is always before end (reverse selection handled automatically)
         const start = min([prev.start, date]);
         const end = max([prev.start, date]);
         return { start, end };
       }
 
-      // If both are selected, reset and select new start
       return { start: date, end: null };
     });
   }, []);
@@ -79,8 +94,12 @@ export function useCalendar(initialDate: Date = new Date()) {
   return {
     currentDate,
     selection,
+    selectionStats,
     nextMonth,
     prevMonth,
+    goToToday,
+    setMonth,
+    setYear,
     getDaysInMonth,
     handleDateSelect,
     getDayStatus,

@@ -1,12 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4f4f4;
-  --foreground: #1c1c1c;
+  --background: #fdfdfd;
+  --foreground: #111111;
   --accent-blue: #308be7;
   --accent-blue-light: #e1effd;
-  --gray-text: #969696;
-  --border-color: #eaeaea;
+  --gray-text: #666666;
+  --border-color: #eeeeee;
+  --card-bg: #ffffff;
+  --ring-binding: #d1d5db;
+}
+
+[data-theme='dark'] {
+  --background: #0a0a0a;
+  --foreground: #f0f0f0;
+  --accent-blue: #308be7;
+  --accent-blue-light: rgba(48, 139, 231, 0.1);
+  --gray-text: #888888;
+  --border-color: #1a1a1a;
+  --card-bg: #111111;
+  --ring-binding: #333333;
 }
 
 @theme inline {
@@ -16,14 +29,17 @@
   --color-accent-blue-light: var(--accent-blue-light);
   --color-gray-text: var(--gray-text);
   --color-border-color: var(--border-color);
+  --color-card-bg: var(--card-bg);
+  --color-ring-binding: var(--ring-binding);
   --font-sans: var(--font-inter);
-  --font-heading: var(--font-space-grotesk); /* Optional, but we'll use sans mostly */
+  --font-heading: var(--font-space-grotesk);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Lenis */
@@ -55,14 +71,22 @@ html.lenis, html.lenis body {
   border-radius: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #ccc;
+  background: #555;
 }
 
-/* Spiral Binding CSS generated loops */
+/* Spiral Binding Background */
 .spiral-holes {
   background-image: 
-    radial-gradient(circle at 10px 10px, #f4f4f4 4px, transparent 4px),
-    radial-gradient(circle at 10px 10px, rgba(0,0,0,0.1) 5px, transparent 5px);
+    radial-gradient(circle at 10px 10px, var(--background) 4px, transparent 4px),
+    radial-gradient(circle at 10px 10px, rgba(0,0,0,0.05) 5px, transparent 5px);
   background-size: 20px 20px;
   background-repeat: repeat-x;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.hero-gradient {
+  background: radial-gradient(circle at 50% 50%, rgba(48, 139, 231, 0.15), transparent 70%);
 }
