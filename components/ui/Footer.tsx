@@ -20,7 +20,7 @@ export function Footer() {
           <p className="text-sm text-gray-text font-medium max-w-sm text-center md:text-left">
             A premium, physical calendar experience designed for digital focus.
             Recreating the timeless wall calendar aesthetic in a modern Next.js app.
-            <br /><br />Build by :<br /> Yashita Bahrani
+            <br /><br />Built by :<br /> Yashita Bahrani
           </p>
         </div>
 

@@ -7,6 +7,7 @@ import { useNotes } from '@/hooks/useNotes';
 import { ImageSection } from '@/components/ImageSection';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, Info } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function WallCalendar() {
   const calendar = useCalendar();
@@ -85,19 +86,22 @@ export function WallCalendar() {
         <div className="absolute top-0 left-0 w-full h-8 spiral-holes z-20 pointer-events-none opacity-40" />
         
         {/* Fake Spiral Metal Rings */}
-        <div className="absolute top-[-8px] left-0 w-full h-12 flex justify-between px-10 z-30 pointer-events-none opacity-60">
+        <div className="absolute top-[-8px] left-0 w-full h-12 flex justify-between px-6 md:px-10 z-30 pointer-events-none opacity-60">
           {Array.from({ length: 42 }).map((_, i) => (
-            <div key={i} className="w-2 h-full rounded-full bg-gradient-to-b from-ring-binding via-ring-binding/70 to-ring-binding/30 shadow-sm" />
+            <div key={i} className={cn(
+              "w-2 h-full rounded-full bg-gradient-to-b from-ring-binding via-ring-binding/70 to-ring-binding/30 shadow-sm",
+              i % 2 !== 0 && "hidden md:block" // Every other ring is hidden on mobile
+            )} />
           ))}
         </div>
 
         <ImageSection currentDate={calendar.currentDate} />
 
         <div className="flex flex-col md:flex-row w-full divide-y md:divide-y-0 md:divide-x divide-border-color transition-colors duration-500">
-          <div className="w-full md:w-5/12 p-10 md:p-14 shrink-0 bg-background/20 transition-colors duration-500">
+          <div className="w-full md:w-5/12 p-6 md:p-14 shrink-0 bg-background/20 transition-colors duration-500">
             <NotesPanel calendar={calendar} notesStore={notesStore} />
           </div>
-          <div className="w-full md:w-7/12 p-10 md:p-14 flex items-center justify-center bg-card-bg transition-colors duration-500">
+          <div className="w-full md:w-7/12 p-6 md:p-14 flex items-center justify-center bg-card-bg transition-colors duration-500">
             <CalendarGrid calendar={calendar} notesStore={notesStore} />
           </div>
         </div>

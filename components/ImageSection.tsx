@@ -19,7 +19,7 @@ export function ImageSection({ currentDate }: ImageSectionProps) {
   const bottomPathColor = mounted && resolvedTheme === 'dark' ? '#111111' : '#ffffff';
 
   return (
-    <div className="relative w-full h-[400px] md:h-[450px] overflow-hidden bg-gray-200">
+    <div className="relative w-full h-[200px] md:h-[450px] overflow-hidden bg-gray-200">
       <img 
         src="https://images.unsplash.com/photo-1522163182402-834f871fd851?q=80&w=1600&auto=format&fit=crop" 
         alt="Mountain Climber" 

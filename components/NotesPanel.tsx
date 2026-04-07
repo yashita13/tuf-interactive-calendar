@@ -42,7 +42,7 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
   };
 
   return (
-    <div className="w-full h-full flex flex-col group min-h-[600px] transition-all">
+    <div className="w-full h-full flex flex-col group min-h-[400px] md:min-h-[600px] transition-all">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-accent-blue/10 rounded-xl flex items-center justify-center text-accent-blue border border-accent-blue/20">
