@@ -60,7 +60,7 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
         >
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-accent-blue/50">Current Target</span>
+              <span className="text-xs font-black uppercase tracking-widest text-accent-blue/50">Current Target</span>
               <div className="h-[1px] flex-grow bg-border-color/60" />
             </div>
             <p className="text-lg font-bold text-foreground tracking-tight">
@@ -106,7 +106,7 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
                 <button 
                   type="button"
                   onClick={() => setNoteType('note')}
-                  className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                  className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
                     noteType === 'note' ? 'bg-accent-blue text-white shadow-lg shadow-accent-blue/20' : 'text-gray-text hover:text-foreground'
                   }`}
                 >
@@ -115,7 +115,7 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
                 <button 
                   type="button"
                   onClick={() => setNoteType('event')}
-                  className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                  className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
                     noteType === 'event' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'text-gray-text hover:text-foreground'
                   }`}
                 >
@@ -138,7 +138,7 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
       {/* Saved Entries List */}
       <div className="flex-grow">
           <div className="flex items-center gap-4 mb-6">
-            <span className="text-[10px] font-black uppercase tracking-widest text-gray-text/30">History of entries</span>
+            <span className="text-xs font-black uppercase tracking-widest text-gray-text/30">History of entries</span>
             <div className="h-[1px] flex-grow bg-border-color/60" />
           </div>
 
@@ -151,7 +151,7 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
                    className="py-10 flex flex-col items-center justify-center opacity-30 text-center"
                 >
                   <Info size={24} className="mb-2" />
-                  <p className="text-xs font-bold uppercase tracking-widest">No entries documented.</p>
+                  <p className="text-sm font-bold uppercase tracking-widest">No entries documented.</p>
                 </motion.div>
               ) : (
                 activeNotes.sort((a,b) => b.createdAt - a.createdAt).map(note => (
@@ -169,7 +169,7 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
                             {note.type} • {format(note.createdAt, 'h:mm a')}
                          </span>
                        </div>
-                       <p className="text-sm text-foreground font-medium leading-relaxed break-words">
+                       <p className="text-base text-foreground font-medium leading-relaxed break-words">
                           {note.text}
                        </p>
                     </div>

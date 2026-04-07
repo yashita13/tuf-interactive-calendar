@@ -69,7 +69,7 @@ export function CalendarGrid({ calendar, notesStore }: CalendarGridProps) {
         {WEEKDAYS.map((day, ix) => (
           <div 
             key={day} 
-            className={`flex items-center justify-center text-[10px] md:text-xs font-bold tracking-widest ${ix >= 5 ? 'text-accent-blue/60' : 'text-gray-text/60'}`}
+            className={`flex items-center justify-center text-xs font-bold tracking-widest ${ix >= 5 ? 'text-accent-blue/60' : 'text-gray-text/60'}`}
           >
             {day}
           </div>
@@ -104,7 +104,7 @@ export function CalendarGrid({ calendar, notesStore }: CalendarGridProps) {
             <button 
               key={m}
               onClick={() => jumpMonth(idx)}
-              className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest rounded-md border transition-all ${
+              className={`px-3 py-1 text-[11px] font-bold uppercase tracking-widest rounded-md border transition-all ${
                 idx === currentDate.getMonth() 
                 ? 'bg-accent-blue/10 border-accent-blue/30 text-accent-blue' 
                 : 'bg-transparent border-border-color text-gray-text/40 hover:border-gray-text/40 hover:text-gray-text'

@@ -63,7 +63,7 @@ export function WallCalendar() {
           </AnimatePresence>
         </div>
 
-        <div className="flex items-center gap-6 text-[11px] font-bold uppercase tracking-widest text-gray-text/60">
+        <div className="flex items-center gap-6 text-xs font-bold uppercase tracking-widest text-gray-text/60">
            <div className="flex items-center gap-2">
              <div className="w-1.5 h-1.5 rounded-full bg-accent-blue" />
              <span>{monthlyStats.totalNotes} Memos</span>
@@ -103,10 +103,7 @@ export function WallCalendar() {
         </div>
       </motion.div>
 
-      <div className="flex items-center justify-center gap-3 py-4 text-xs font-bold uppercase tracking-widest text-gray-text/30">
-        <Info size={14} className="text-accent-blue/40" />
-        <p>Tip: Click a start and end date to select a range.</p>
-      </div>
+        <p className="text-sm font-medium">Tip: Click a start and end date to select a range.</p>
     </div>
   );
 }

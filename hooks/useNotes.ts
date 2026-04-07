@@ -23,6 +23,45 @@ export function useNotes() {
       } catch (e) {
         console.error('Failed to parse notes');
       }
+    } else {
+      // Seed sample data for first-time viewers
+      const today = new Date();
+      const month = today.getMonth() + 1;
+      const year = today.getFullYear();
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      
+      const samples: Note[] = [
+        {
+          id: 'sample-1',
+          dateKey: `${year}-${pad(month)}-01`,
+          text: 'Launch of the new interactive calendar project. Team meeting at 10 AM.',
+          type: 'event',
+          createdAt: new Date(`${year}-${pad(month)}-01T10:00:00`).getTime()
+        },
+        {
+          id: 'sample-2',
+          dateKey: `${year}-${pad(month)}-01`,
+          text: 'Remember to check the responsive layout on mobile devices.',
+          type: 'note',
+          createdAt: new Date(`${year}-${pad(month)}-01T14:30:00`).getTime()
+        },
+        {
+          id: 'sample-3',
+          dateKey: `${year}-${pad(month)}-07`,
+          text: 'Code review session with the lead architect.',
+          type: 'event',
+          createdAt: new Date(`${year}-${pad(month)}-07T11:00:00`).getTime()
+        },
+        {
+          id: 'sample-4',
+          dateKey: `${year}-${pad(month)}-15`,
+          text: 'Mid-month performance analytics review.',
+          type: 'note',
+          createdAt: new Date(`${year}-${pad(month)}-15T09:00:00`).getTime()
+        }
+      ];
+      setNotes(samples);
+      localStorage.setItem('calendar-notes', JSON.stringify(samples));
     }
     setIsLoaded(true);
   }, []);

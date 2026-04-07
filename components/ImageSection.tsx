@@ -47,10 +47,10 @@ export function ImageSection({ currentDate }: ImageSectionProps) {
                 transition={{ duration: 0.3 }}
                 className="text-right"
               >
-                <div className="text-2xl font-medium tracking-tight text-white/90">
+                <div className="text-3xl font-medium tracking-tight text-white/90">
                   {format(currentDate, 'yyyy')}
                 </div>
-                <div className="text-4xl md:text-5xl font-bold tracking-tight text-white uppercase mt-1">
+                <div className="text-5xl md:text-6xl font-bold tracking-tight text-white uppercase mt-1">
                   {format(currentDate, 'MMMM')}
                 </div>
               </motion.div>

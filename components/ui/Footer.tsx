@@ -18,24 +18,25 @@ export function Footer() {
             <span className="text-xl font-bold tracking-tight text-foreground">Chronicle</span>
           </div>
           <p className="text-sm text-gray-text font-medium max-w-sm text-center md:text-left">
-            A premium, physical calendar experience designed for digital focus. 
+            A premium, physical calendar experience designed for digital focus.
             Recreating the timeless wall calendar aesthetic in a modern Next.js app.
+            <br /><br />Build by :<br /> Yashita Bahrani
           </p>
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-8 text-sm font-semibold text-gray-text">
-          <a href="#" className="hover:text-accent-blue transition-colors">Twitter</a>
-          <a href="#" className="hover:text-accent-blue transition-colors">GitHub</a>
-          <a href="#" className="hover:text-accent-blue transition-colors">Dribbble</a>
-          <a href="#" className="hover:text-accent-blue transition-colors">Product Hunt</a>
+          <a href="https://portfolio-animation-chi.vercel.app/" className="hover:text-accent-blue transition-colors">Portfolio</a>
+          <a href="https://github.com/yashita13" className="hover:text-accent-blue transition-colors">GitHub</a>
+          <a href="https://www.linkedin.com/in/yashita-bahrani/" className="hover:text-accent-blue transition-colors">LinkedIn</a>
+          <a href="https://drive.google.com/file/d/1K_rx47013ihfytNULVwI5gsTc2wEMpaq/view?usp=sharing" className="hover:text-accent-blue transition-colors">Resume</a>
         </div>
       </div>
-      
+
       <div className="max-w-6xl mx-auto mt-12 md:mt-24 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-text/40">
         <p>© 2026 Chronicle. Built with Precision.</p>
         <div className="flex items-center gap-6">
-           <a href="#" className="hover:text-accent-blue transition-colors">Privacy Policy</a>
-           <a href="#" className="hover:text-accent-blue transition-colors">Terms of Service</a>
+          <a href="#" className="hover:text-accent-blue transition-colors">Privacy Policy</a>
+          <a href="#" className="hover:text-accent-blue transition-colors">Terms of Service</a>
         </div>
       </div>
     </footer>
