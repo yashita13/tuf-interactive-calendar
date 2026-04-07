@@ -2,12 +2,16 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { isSameMonth, parseISO } from 'date-fns';
 
 export type NoteType = 'note' | 'event';
+export type NoteCategory = 'work' | 'personal' | 'urgent' | 'general';
+export type RecurrenceType = 'none' | 'weekly' | 'monthly';
 
 export type Note = {
   id: string;
   dateKey: string; // YYYY-MM-DD
   text: string;
   type: NoteType;
+  category: NoteCategory;
+  recurrence: RecurrenceType;
   createdAt: number;
 };
 
@@ -34,29 +38,37 @@ export function useNotes() {
         {
           id: 'sample-1',
           dateKey: `${year}-${pad(month)}-01`,
-          text: 'Launch of the new interactive calendar project. Team meeting at 10 AM.',
+          text: '🚀 Launch of the new Chronicle Calendar project.',
           type: 'event',
+          category: 'work',
+          recurrence: 'none',
           createdAt: new Date(`${year}-${pad(month)}-01T10:00:00`).getTime()
         },
         {
           id: 'sample-2',
           dateKey: `${year}-${pad(month)}-01`,
-          text: 'Remember to check the responsive layout on mobile devices.',
+          text: 'Check responsiveness on ultra-wide monitors.',
           type: 'note',
+          category: 'urgent',
+          recurrence: 'none',
           createdAt: new Date(`${year}-${pad(month)}-01T14:30:00`).getTime()
         },
         {
           id: 'sample-3',
           dateKey: `${year}-${pad(month)}-07`,
-          text: 'Code review session with the lead architect.',
+          text: 'Weekly Sync with lead designer.',
           type: 'event',
+          category: 'work',
+          recurrence: 'weekly',
           createdAt: new Date(`${year}-${pad(month)}-07T11:00:00`).getTime()
         },
         {
           id: 'sample-4',
           dateKey: `${year}-${pad(month)}-15`,
-          text: 'Mid-month performance analytics review.',
+          text: 'Personal meditation and focus session.',
           type: 'note',
+          category: 'personal',
+          recurrence: 'none',
           createdAt: new Date(`${year}-${pad(month)}-15T09:00:00`).getTime()
         }
       ];
@@ -71,20 +83,22 @@ export function useNotes() {
     localStorage.setItem('calendar-notes', JSON.stringify(newNotes));
   };
 
-  const addNote = useCallback((dateKey: string, text: string, type: NoteType = 'note') => {
+  const addNote = useCallback((dateKey: string, text: string, type: NoteType = 'note', category: NoteCategory = 'general', recurrence: RecurrenceType = 'none') => {
     const newNote: Note = {
       id: crypto.randomUUID(),
       dateKey,
       text,
       type,
+      category,
+      recurrence,
       createdAt: Date.now()
     };
     saveNotes([...notes, newNote]);
   }, [notes]);
 
-  const updateNote = useCallback((id: string, text: string, type?: NoteType) => {
+  const updateNote = useCallback((id: string, text: string, type?: NoteType, category?: NoteCategory) => {
     const newNotes = notes.map(n => 
-      n.id === id ? { ...n, text, type: type || n.type } : n
+      n.id === id ? { ...n, text, type: type || n.type, category: category || n.category } : n
     );
     saveNotes(newNotes);
   }, [notes]);
@@ -114,8 +128,20 @@ export function useNotes() {
     return {
       totalNotes: monthlyNotes.filter(n => n.type === 'note').length,
       totalEvents: monthlyNotes.filter(n => n.type === 'event').length,
-      totalEntries: monthlyNotes.length
+      totalEntries: monthlyNotes.length,
+      workCount: monthlyNotes.filter(n => n.category === 'work').length,
+      personalCount: monthlyNotes.filter(n => n.category === 'personal').length,
+      urgentCount: monthlyNotes.filter(n => n.category === 'urgent').length,
     };
+  }, [notes]);
+
+  const upcomingEvents = useMemo(() => {
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    return notes
+      .filter(n => n.dateKey >= todayStr)
+      .sort((a,b) => a.dateKey.localeCompare(b.dateKey))
+      .slice(0, 5);
   }, [notes]);
 
   return {
@@ -127,6 +153,7 @@ export function useNotes() {
     getNotesForDate,
     hasNotes,
     hasEvents,
-    getMonthlyStats
+    getMonthlyStats,
+    upcomingEvents
   };
 }

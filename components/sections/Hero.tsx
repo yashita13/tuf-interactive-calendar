@@ -38,18 +38,18 @@ export function Hero() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="mb-8 px-5 py-2 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-[10px] md:text-xs font-black uppercase tracking-[0.3em] hidden md:flex items-center gap-3 shadow-inner shadow-accent-blue/5"
+            className="mt-20 mb-10 px-6 py-2.5 rounded-full bg-accent-blue/10 border border-accent-blue/20 text-accent-blue text-[10px] md:text-xs font-black uppercase tracking-[0.4em] inline-flex items-center gap-3 shadow-inner shadow-accent-blue/5"
           >
-            <div className="w-1.5 h-1.5 rounded-full bg-accent-blue animate-pulse shadow-lg shadow-accent-blue/50" />
-            V0.2 • Immersive Timeline Alpha
+            <div className="w-2 h-2 rounded-full bg-accent-blue animate-pulse shadow-[0_0_15px_rgba(48,139,231,0.8)]" />
+            V0.3 • The Intelligence Update
           </motion.div>
 
           <motion.h1
-            className="text-6xl md:text-9xl font-bold tracking-tight font-heading leading-tight mb-8 text-foreground transition-colors duration-500"
+            className="text-7xl md:text-[10rem] font-black tracking-tighter font-heading leading-[0.8] mb-12 text-foreground transition-colors duration-500 uppercase"
           >
-            Chronicle. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-blue via-accent-blue/80 to-accent-blue/60 drop-shadow-sm">
-              the timeline.
+            CHRONICLE.<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-blue via-accent-blue/80 to-accent-blue/60 drop-shadow-2xl">
+              INTERACTIVE.
             </span>
           </motion.h1>
 
@@ -57,13 +57,13 @@ export function Hero() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
-            className="text-lg md:text-xl text-gray-text font-medium mb-14 max-w-2xl mx-auto leading-relaxed transition-colors duration-500"
+            className="text-xl md:text-2xl text-gray-text font-bold mb-16 max-w-3xl mx-auto leading-relaxed transition-colors duration-500 uppercase tracking-tight"
           >
-            A physical artifact for the digital age. Document your memos, span your timeline,
-            and experience precise, premium calendar recreation.
+            Precision engineering for your timeline. <br />
+            <span className="text-foreground/40">Drag. Document. Analyze. Repeat.</span>
           </motion.p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-15">
             <Link
               href="#calendar"
               className="group relative px-10 py-5 bg-accent-blue hover:bg-accent-blue/90 text-white rounded-[1.25rem] font-black uppercase tracking-widest text-[11px] transition-all shadow-2xl shadow-accent-blue/40 active:scale-95 flex items-center gap-3 overflow-hidden"

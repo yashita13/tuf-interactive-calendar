@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CalendarGrid } from '@/components/CalendarGrid';
 import { NotesPanel } from '@/components/NotesPanel';
@@ -16,63 +17,109 @@ export function WallCalendar() {
   const { selectionStats, currentDate } = calendar;
   const monthlyStats = notesStore.getMonthlyStats(currentDate);
 
+  const [accentColor, setAccentColor] = useState('#308be7');
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--accent-blue', accentColor);
+    // Rough RGB approximation for shadows/transparency
+    const r = parseInt(accentColor.slice(1, 3), 16);
+    const g = parseInt(accentColor.slice(3, 5), 16);
+    const b = parseInt(accentColor.slice(5, 7), 16);
+    document.documentElement.style.setProperty('--accent-color-rgb', `${r}, ${g}, ${b}`);
+  }, [accentColor]);
+
+  const ACCENTS = [
+    { name: 'Classic', color: '#308be7' },
+    { name: 'Emerald', color: '#10b981' },
+    { name: 'Rose', color: '#f43f5e' },
+    { name: 'Amber', color: '#f59e0b' },
+    { name: 'Violet', color: '#8b5cf6' },
+  ];
+
   if (!notesStore.isLoaded) return null;
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto">
-      {/* Selection & Analytics Stats Bar */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-4 py-3 bg-card-bg/40 backdrop-blur-md rounded-2xl border border-border-color shadow-sm transition-all duration-500">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-accent-blue/10 flex items-center justify-center text-accent-blue">
-            <CalendarIcon size={18} />
+      {/* Product Analytics & Selection Bar */}
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-6 px-6 py-4 bg-card-bg/40 backdrop-blur-xl rounded-2xl border border-border-color shadow-2xl transition-all duration-500 overflow-hidden relative group">
+        <div className="absolute inset-0 bg-gradient-to-r from-accent-blue/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+        
+        <div className="flex items-center gap-4 relative z-10">
+          <div className="w-12 h-12 rounded-xl bg-accent-blue/10 flex items-center justify-center text-accent-blue border border-accent-blue/20 shadow-inner">
+            <CalendarIcon size={24} />
           </div>
-          <AnimatePresence mode="wait">
-            {!selectionStats ? (
-              <motion.span 
-                key="default"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="text-sm font-semibold text-gray-text"
-              >
-                Select a date range to begin.
-              </motion.span>
-            ) : (
-              <motion.div 
-                key="selected"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="flex items-center gap-2"
-              >
-                <span className="text-sm font-bold text-foreground">
-                  {format(selectionStats.start, 'MMM d, yyyy')}
-                </span>
-                {selectionStats.days > 1 && (
-                  <>
-                    <span className="text-gray-text">→</span>
-                    <span className="text-sm font-bold text-foreground">
-                      {format(selectionStats.end, 'MMM d, yyyy')}
+          <div className="flex flex-col">
+            <AnimatePresence mode="wait">
+              {!selectionStats ? (
+                <motion.div 
+                  key="default"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+                  className="flex flex-col"
+                >
+                  <span className="text-sm font-black uppercase tracking-[0.2em] text-accent-blue/60 mb-0.5">Focus Target</span>
+                  <span className="text-lg font-bold text-gray-text/40">Select a range to begin</span>
+                </motion.div>
+              ) : (
+                <motion.div 
+                  key="selected"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+                  className="flex flex-col"
+                >
+                  <span className="text-sm font-black uppercase tracking-[0.2em] text-accent-blue/60 mb-0.5">
+                    {selectionStats.days} {selectionStats.days === 1 ? 'Day' : 'Days'} Insight
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl font-bold text-foreground transition-colors">
+                      {format(selectionStats.start, 'MMM d')}
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-accent-blue/10 text-accent-blue text-[10px] font-bold uppercase tracking-widest ml-2">
-                      {selectionStats.days} Days
-                    </span>
-                  </>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                    {selectionStats.days > 1 && (
+                      <>
+                        <div className="w-4 h-[2px] bg-accent-blue/30 rounded-full" />
+                        <span className="text-xl font-bold text-foreground transition-colors">
+                          {format(selectionStats.end, 'MMM d')}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
-        <div className="flex items-center gap-6 text-xs font-bold uppercase tracking-widest text-gray-text/60">
-           <div className="flex items-center gap-2">
-             <div className="w-1.5 h-1.5 rounded-full bg-accent-blue" />
-             <span>{monthlyStats.totalNotes} Memos</span>
-           </div>
-           <div className="flex items-center gap-2">
-             <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-             <span>{monthlyStats.totalEvents} Events</span>
-           </div>
+        <div className="flex flex-col sm:flex-row items-center gap-8 relative z-10">
+          {/* Accent Picker */}
+          <div className="flex items-center gap-3 p-1.5 bg-background/50 rounded-full border border-border-color shadow-sm">
+            {ACCENTS.map((a) => (
+              <button 
+                key={a.color}
+                onClick={() => setAccentColor(a.color)}
+                className={cn(
+                  "w-6 h-6 rounded-full transition-all hover:scale-125 active:scale-95 border-2",
+                  accentColor === a.color ? "border-white scale-110 shadow-lg" : "border-transparent opacity-60"
+                )}
+                style={{ backgroundColor: a.color }}
+                title={a.name}
+              />
+            ))}
+          </div>
+
+          <div className="h-8 w-[1px] bg-border-color hidden sm:block" />
+
+          <div className="flex items-center gap-8 font-heading">
+             <div className="flex flex-col items-center">
+               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-text/30">Memos</span>
+               <span className="text-2xl font-bold text-accent-blue leading-none mt-1">{monthlyStats.totalNotes}</span>
+             </div>
+             <div className="flex flex-col items-center">
+               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-text/30">Events</span>
+               <span className="text-2xl font-bold text-orange-500 leading-none mt-1">{monthlyStats.totalEvents}</span>
+             </div>
+          </div>
         </div>
       </div>
 

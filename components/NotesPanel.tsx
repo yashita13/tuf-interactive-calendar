@@ -1,10 +1,11 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { useCalendar } from '@/hooks/useCalendar';
-import { useNotes, NoteType } from '@/hooks/useNotes';
-import { Edit3, Trash2, Calendar as CalendarIcon, Info, Send, CheckCircle2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useNotes, NoteType, NoteCategory, RecurrenceType } from '@/hooks/useNotes';
+import { Edit3, Trash2, Calendar as CalendarIcon, Info, Send, CheckCircle2, Zap, Briefcase, User, AlertTriangle, Clock } from 'lucide-react';
 
 interface NotesPanelProps {
   calendar: ReturnType<typeof useCalendar>;
@@ -13,177 +14,250 @@ interface NotesPanelProps {
 
 export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
   const { selection, selectionStats } = calendar;
-  const { addNote, removeNote, updateNote, getNotesForDate } = notesStore;
+  const { addNote, removeNote, updateNote, getNotesForDate, upcomingEvents } = notesStore;
 
   const activeDate = selection.start;
   const activeDateKey = activeDate ? format(activeDate, 'yyyy-MM-dd') : null;
   const displayDate = activeDate ? format(activeDate, 'MMM do, yyyy') : '';
 
   const activeNotes = activeDateKey ? getNotesForDate(activeDateKey) : [];
-  
+
   const [localText, setLocalText] = useState('');
   const [noteType, setNoteType] = useState<NoteType>('note');
+  const [category, setCategory] = useState<NoteCategory>('general');
+  const [recurrence, setRecurrence] = useState<RecurrenceType>('none');
   const [isSaved, setIsSaved] = useState(false);
 
   // Sync text when selection changes
   useEffect(() => {
     setLocalText('');
+    setCategory('general');
     setIsSaved(false);
   }, [activeDateKey]);
+
+  // Basic "Auto-suggest" Logic
+  useEffect(() => {
+    const text = localText.toLowerCase();
+    if (text.includes('meeting') || text.includes('call') || text.includes('sync') || text.includes('report')) {
+      setCategory('work');
+    } else if (text.includes('gym') || text.includes('dinner') || text.includes('party') || text.includes('meditation')) {
+      setCategory('personal');
+    } else if (text.includes('urgent') || text.includes('immediate') || text.includes('blocker') || text.includes('asap')) {
+      setCategory('urgent');
+    }
+  }, [localText]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeDateKey || !localText.trim()) return;
 
-    addNote(activeDateKey, localText.trim(), noteType);
+    addNote(activeDateKey, localText.trim(), noteType, category, recurrence);
     setLocalText('');
+    setIsSaved(false);
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 2000);
   };
 
+  const getCategoryIcon = (cat: NoteCategory) => {
+    switch (cat) {
+      case 'work': return <Briefcase size={12} />;
+      case 'personal': return <User size={12} />;
+      case 'urgent': return <AlertTriangle size={12} />;
+      default: return <Zap size={12} />;
+    }
+  };
+
+  const CATEGORIES: { id: NoteCategory, label: string, color: string }[] = [
+    { id: 'general', label: 'General', color: 'bg-gray-500' },
+    { id: 'work', label: 'Work', color: 'bg-accent-blue' },
+    { id: 'personal', label: 'Personal', color: 'bg-emerald-500' },
+    { id: 'urgent', label: 'Urgent', color: 'bg-rose-500' },
+  ];
+
   return (
-    <div className="w-full h-full flex flex-col group min-h-[400px] md:min-h-[600px] transition-all">
+    <div className="w-full h-full flex flex-col group min-h-[500px] md:min-h-[700px] transition-all">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-accent-blue/10 rounded-xl flex items-center justify-center text-accent-blue border border-accent-blue/20">
             <Edit3 size={20} />
           </div>
-          <h3 className="text-xl font-bold font-heading tracking-tight text-foreground uppercase tracking-widest">Memos & Events</h3>
+          <h3 className="text-xl font-bold font-heading tracking-tight text-foreground uppercase tracking-widest">Chronicle Entry</h3>
         </div>
       </div>
-      
-      {activeDate ? (
-        <motion.div 
-           initial={{ opacity: 0, x: -10 }}
-           animate={{ opacity: 1, x: 0 }}
-           className="mb-8"
+
+      {activeDate && (
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="mb-8 p-4 bg-background/40 rounded-2xl border border-border-color border-dashed"
         >
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black uppercase tracking-widest text-accent-blue/50">Current Target</span>
-              <div className="h-[1px] flex-grow bg-border-color/60" />
-            </div>
-            <p className="text-lg font-bold text-foreground tracking-tight">
-              {selectionStats?.days && selectionStats.days > 1 
-                ? `${format(selectionStats.start, 'MMM d')} → ${format(selectionStats.end, 'MMM d')}` 
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-blue/60 mb-1">Targeted Timeline</span>
+            <p className="text-lg font-bold text-foreground tracking-tight flex items-center gap-2">
+              <CalendarIcon size={16} className="text-accent-blue" />
+              {selectionStats?.days && selectionStats.days > 1
+                ? `${format(selectionStats.start, 'MMM d')} → ${format(selectionStats.end, 'MMM d')} (${selectionStats.days} days)`
                 : displayDate
               }
             </p>
           </div>
         </motion.div>
-      ) : (
-        <div className="mb-8 p-6 rounded-2xl bg-accent-blue/5 border border-dashed border-accent-blue/20 flex flex-col items-center justify-center gap-4 text-center">
-          <CalendarIcon size={32} className="text-accent-blue/30" />
-          <p className="text-sm text-gray-text font-semibold max-w-[200px]">
-             Experience precision. Click a day to document your timeline.
-          </p>
-        </div>
       )}
 
       {/* Note Editor */}
       <div className="relative mb-10">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="relative flex-grow bg-background/60 backdrop-blur-sm rounded-2xl p-6 border border-border-color shadow-inner transition-all hover:bg-background/80">
-            {/* Background lines aesthetic */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.08]" 
-                style={{ 
-                  backgroundImage: 'linear-gradient(transparent, transparent 31px, var(--foreground) 31px, var(--foreground) 32px)',
-                  backgroundSize: '100% 32px' 
-                }}>
-            </div>
-            
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <div className="relative flex-grow bg-background/60 backdrop-blur-sm rounded-2xl p-6 border border-border-color shadow-2xl transition-all focus-within:border-accent-blue/40 focus-within:ring-1 focus-within:ring-accent-blue/20">
             <textarea
               disabled={!activeDate}
               value={localText}
               onChange={(e) => setLocalText(e.target.value)}
-              placeholder="Jot down a memo or event..."
-              className="w-full min-h-[120px] bg-transparent resize-none focus:outline-none text-base text-foreground leading-[32px] pt-[2px] font-medium placeholder:text-gray-text/20 transition-all z-10"
+              placeholder="What's happening in this timeline? (e.g. 'Project sync', 'Gym session')..."
+              className="w-full min-h-[140px] bg-transparent resize-none focus:outline-none text-base text-foreground leading-relaxed font-medium placeholder:text-gray-text/20 transition-all z-10"
             />
+            {localText.length > 0 && (
+              <div className="absolute top-4 right-4 animate-in fade-in zoom-in duration-300">
+                <div className={cn("px-2 py-1 rounded text-[10px] font-bold text-white uppercase tracking-tighter",
+                  CATEGORIES.find(c => c.id === category)?.color
+                )}>
+                  {category} Suggested
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-             <div className="flex p-1 bg-background/80 rounded-xl border border-border-color shadow-sm w-full sm:w-auto">
-                <button 
+          <div className="flex flex-col gap-4">
+            {/* Category Picker */}
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setCategory(cat.id)}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border",
+                    category === cat.id
+                      ? `${cat.color} text-white border-transparent shadow-lg shadow-black/20`
+                      : "bg-background/40 border-border-color text-gray-text hover:border-gray-text/40"
+                  )}
+                >
+                  {getCategoryIcon(cat.id)}
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex p-1 bg-background/80 rounded-xl border border-border-color shadow-sm w-full sm:w-auto">
+                <button
                   type="button"
                   onClick={() => setNoteType('note')}
-                  className={`flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
-                    noteType === 'note' ? 'bg-accent-blue text-white shadow-lg shadow-accent-blue/20' : 'text-gray-text hover:text-foreground'
-                  }`}
+                  className={`flex-1 sm:flex-none px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${noteType === 'note' ? 'bg-accent-blue text-white shadow-lg shadow-accent-blue/20' : 'text-gray-text hover:text-foreground'
+                    }`}
                 >
                   Memo
                 </button>
-                <button 
+                <button
                   type="button"
                   onClick={() => setNoteType('event')}
-                  className={`flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
-                    noteType === 'event' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'text-gray-text hover:text-foreground'
-                  }`}
+                  className={`flex-1 sm:flex-none px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${noteType === 'event' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'text-gray-text hover:text-foreground'
+                    }`}
                 >
                   Event
                 </button>
-             </div>
+              </div>
 
-             <button 
+              <button
                 type="submit"
                 disabled={!activeDate || !localText.trim()}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2 bg-accent-blue hover:bg-accent-blue/90 disabled:opacity-20 disabled:hover:bg-accent-blue text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-accent-blue/20 active:scale-95"
-             >
-                {isSaved ? <CheckCircle2 size={16} /> : <Send size={16} />}
+                className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-3 bg-accent-blue hover:bg-accent-blue/90 disabled:opacity-20 disabled:hover:bg-accent-blue text-white rounded-xl text-sm font-black tracking-widest transition-all shadow-xl shadow-accent-blue/20 active:scale-95 border border-white/10"
+              >
+                {isSaved ? <CheckCircle2 size={18} /> : <Send size={18} />}
                 {isSaved ? 'SAVED' : 'SAVE'}
-             </button>
+              </button>
+            </div>
           </div>
         </form>
       </div>
 
-      {/* Saved Entries List */}
-      <div className="flex-grow">
+      {/* History & Upcoming Panel */}
+      <div className="flex-grow flex flex-col gap-10">
+        <div>
           <div className="flex items-center gap-4 mb-6">
-            <span className="text-xs font-black uppercase tracking-widest text-gray-text/30">History of entries</span>
-            <div className="h-[1px] flex-grow bg-border-color/60" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-text/30">Active Selection History</span>
+            <div className="h-[1px] flex-grow bg-border-color/40" />
           </div>
 
           <div className="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
-            <AnimatePresence>
+            <AnimatePresence mode="popLayout">
               {activeNotes.length === 0 ? (
-                <motion.div 
-                   initial={{ opacity: 0 }} 
-                   animate={{ opacity: 1 }} 
-                   className="py-10 flex flex-col items-center justify-center opacity-30 text-center"
+                <motion.div
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="py-12 flex flex-col items-center justify-center opacity-20 text-center border-2 border-dashed border-border-color rounded-3xl"
                 >
-                  <Info size={24} className="mb-2" />
-                  <p className="text-sm font-bold uppercase tracking-widest">No entries documented.</p>
+                  <Info size={32} className="mb-3" />
+                  <p className="text-xs font-black uppercase tracking-[0.2em]">No entries for this date.</p>
                 </motion.div>
               ) : (
-                activeNotes.sort((a,b) => b.createdAt - a.createdAt).map(note => (
-                  <motion.div 
+                activeNotes.sort((a: any, b: any) => b.createdAt - a.createdAt).map((note: any) => (
+                  <motion.div
                     key={note.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    className="p-5 rounded-2xl bg-background/40 border border-border-color flex justify-between gap-4 group hover:bg-accent-blue/5 hover:border-accent-blue/20 transition-all shadow-sm"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="p-5 rounded-3xl bg-background/40 border border-border-color flex justify-between gap-4 group hover:bg-accent-blue/5 hover:border-accent-blue/20 transition-all shadow-sm relative overflow-hidden"
                   >
-                    <div className="flex flex-col gap-2 min-w-0">
-                       <div className="flex items-center gap-2">
-                         <div className={`w-1.5 h-1.5 rounded-full ${note.type === 'event' ? 'bg-orange-500' : 'bg-accent-blue'}`} />
-                         <span className="text-[9px] font-black uppercase tracking-[0.1em] text-gray-text/60">
-                            {note.type} • {format(note.createdAt, 'h:mm a')}
-                         </span>
-                       </div>
-                       <p className="text-base text-foreground font-medium leading-relaxed break-words">
-                          {note.text}
-                       </p>
+                    <div className={cn("absolute left-0 top-0 w-1 h-full", CATEGORIES.find(c => c.id === note.category)?.color)} />
+                    <div className="flex flex-col gap-2 min-w-0 flex-grow">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className={cn("w-2 h-2 rounded-full", note.type === 'event' ? 'bg-orange-500' : 'bg-accent-blue')} />
+                          <span className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-text/60">
+                            {note.category} • {format(note.createdAt, 'h:mm a')}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => removeNote(note.id)}
+                          className="p-2 rounded-xl text-gray-text/20 hover:text-red-500 hover:bg-red-500/5 transition-all opacity-0 group-hover:opacity-100 shrink-0"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                      <p className="text-base text-foreground font-medium leading-relaxed break-words">
+                        {note.text}
+                      </p>
                     </div>
-                    <button 
-                       onClick={() => removeNote(note.id)}
-                       className="p-2 rounded-lg text-gray-text/20 hover:text-red-500 hover:bg-red-500/5 transition-all opacity-0 group-hover:opacity-100 shrink-0"
-                    >
-                       <Trash2 size={16} />
-                    </button>
                   </motion.div>
                 ))
               )}
             </AnimatePresence>
           </div>
+        </div>
+
+        {/* Upcoming Section */}
+        <div className="mt-auto border-t border-border-color pt-10">
+          <div className="flex items-center gap-4 mb-6">
+            <Clock size={16} className="text-accent-blue/40" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-text/40">Upcoming in Timeline</span>
+            <div className="h-[1px] flex-grow bg-border-color/40" />
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {upcomingEvents.map((event: any) => (
+              <div key={event.id} className="flex items-center gap-4 group cursor-pointer">
+                <div className="w-14 text-[10px] font-black text-gray-text/40 uppercase tracking-tighter">
+                  {format(parseISO(event.dateKey), 'MMM d')}
+                </div>
+                <div className="flex-grow flex items-center gap-3 p-3 bg-card-bg/20 rounded-2xl border border-border-color/40 group-hover:bg-accent-blue/5 transition-all">
+                  <div className={cn("w-1.5 h-1.5 rounded-full", event.category === 'urgent' ? 'bg-rose-500' : 'bg-gray-500')} />
+                  <p className="text-xs font-bold text-gray-text line-clamp-1">{event.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

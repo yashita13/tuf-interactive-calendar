@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export function Navbar() {
   return (
-    <motion.nav 
+    <motion.nav
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
@@ -25,8 +25,8 @@ export function Navbar() {
 
       <div className="flex items-center gap-4">
         <ThemeToggle />
-        <Link 
-          href="#calendar" 
+        <Link
+          href="#calendar"
           className="hidden md:flex px-5 py-2 bg-accent-blue hover:bg-accent-blue/90 text-white rounded-full text-sm font-semibold transition-all shadow-lg shadow-accent-blue/20 active:scale-95"
         >
           Explore Calendar

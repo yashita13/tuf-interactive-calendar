@@ -4,6 +4,7 @@
   --background: #fdfdfd;
   --foreground: #111111;
   --accent-blue: #308be7;
+  --accent-color-rgb: 48, 139, 231;
   --accent-blue-light: #e1effd;
   --gray-text: #666666;
   --border-color: #eeeeee;
@@ -15,6 +16,7 @@
   --background: #0a0a0a;
   --foreground: #f0f0f0;
   --accent-blue: #308be7;
+  --accent-color-rgb: 48, 139, 231;
   --accent-blue-light: rgba(48, 139, 231, 0.1);
   --gray-text: #888888;
   --border-color: #1a1a1a;
