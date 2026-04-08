@@ -37,26 +37,47 @@
   --font-heading: var(--font-space-grotesk);
 }
 
+html {
+  font-size: 12px;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.3s ease, color 0.3s ease;
+  line-height: 1.65;
 }
 
+
+
+h1,
+h2,
+h3,
+h4,
+.font-heading {
+  line-height: 1.2;
+}
+
+
 /* Lenis */
-html.lenis, html.lenis body {
+html.lenis,
+html.lenis body {
   height: auto;
 }
+
 .lenis.lenis-smooth {
   scroll-behavior: auto !important;
 }
+
 .lenis.lenis-smooth [data-lenis-prevent] {
   overscroll-behavior: contain;
 }
+
 .lenis.lenis-stopped {
   overflow: hidden;
 }
+
 .lenis.lenis-smooth iframe {
   pointer-events: none;
 }
@@ -65,22 +86,25 @@ html.lenis, html.lenis body {
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: var(--border-color);
   border-radius: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
 
 /* Spiral Binding Background */
 .spiral-holes {
-  background-image: 
+  background-image:
     radial-gradient(circle at 10px 10px, var(--background) 4px, transparent 4px),
-    radial-gradient(circle at 10px 10px, rgba(0,0,0,0.05) 5px, transparent 5px);
+    radial-gradient(circle at 10px 10px, rgba(0, 0, 0, 0.05) 5px, transparent 5px);
   background-size: 20px 20px;
   background-repeat: repeat-x;
 }

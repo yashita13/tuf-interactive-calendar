@@ -49,14 +49,29 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const finalizedRecurrence = calendar.recurrence;
     if (!activeDateKey || !localText.trim()) return;
 
-    addNote(activeDateKey, localText.trim(), noteType, category, recurrence);
+    if (selectionStats?.days && selectionStats.days > 1) {
+      addNote(
+        format(selectionStats.start, 'yyyy-MM-dd'),
+        localText.trim(),
+        noteType,
+        category,
+        finalizedRecurrence,
+        format(selectionStats.end, 'yyyy-MM-dd')
+      );
+    } else {
+      addNote(activeDateKey, localText.trim(), noteType, category, finalizedRecurrence);
+    }
+
     setLocalText('');
     setIsSaved(false);
     setIsSaved(true);
+    calendar.setRecurrence('none'); // Reset after add
     setTimeout(() => setIsSaved(false), 2000);
   };
+
 
   const getCategoryIcon = (cat: NoteCategory) => {
     switch (cat) {
@@ -92,7 +107,8 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
           className="mb-8 p-4 bg-background/40 rounded-2xl border border-border-color border-dashed"
         >
           <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-blue/60 mb-1">Targeted Timeline</span>
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-accent-blue/60 mb-1">Targeted Timeline</span>
+
             <p className="text-lg font-bold text-foreground tracking-tight flex items-center gap-2">
               <CalendarIcon size={16} className="text-accent-blue" />
               {selectionStats?.days && selectionStats.days > 1
@@ -128,54 +144,110 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
 
           <div className="flex flex-col gap-4">
             {/* Category Picker */}
-            <div className="flex flex-wrap gap-2">
+            {/* Category Picker - 2 rows for better text fit */}
+            <div className="grid grid-cols-2 gap-2">
               {CATEGORIES.map(cat => (
                 <button
                   key={cat.id}
                   type="button"
                   onClick={() => setCategory(cat.id)}
                   className={cn(
-                    "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border",
+                    "flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all border shadow-sm",
                     category === cat.id
                       ? `${cat.color} text-white border-transparent shadow-lg shadow-black/20`
-                      : "bg-background/40 border-border-color text-gray-text hover:border-gray-text/40"
+                      : "bg-background/40 border-border-color text-gray-text hover:border-accent-blue/20 hover:text-accent-blue"
                   )}
                 >
                   {getCategoryIcon(cat.id)}
-                  {cat.label}
+                  <span className="truncate">{cat.label}</span>
                 </button>
               ))}
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex p-1 bg-background/80 rounded-xl border border-border-color shadow-sm w-full sm:w-auto">
-                <button
-                  type="button"
-                  onClick={() => setNoteType('note')}
-                  className={`flex-1 sm:flex-none px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${noteType === 'note' ? 'bg-accent-blue text-white shadow-lg shadow-accent-blue/20' : 'text-gray-text hover:text-foreground'
-                    }`}
-                >
-                  Memo
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setNoteType('event')}
-                  className={`flex-1 sm:flex-none px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${noteType === 'event' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'text-gray-text hover:text-foreground'
-                    }`}
-                >
-                  Event
-                </button>
-              </div>
+          </div>
 
-              <button
-                type="submit"
-                disabled={!activeDate || !localText.trim()}
-                className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-3 bg-accent-blue hover:bg-accent-blue/90 disabled:opacity-20 disabled:hover:bg-accent-blue text-white rounded-xl text-sm font-black tracking-widest transition-all shadow-xl shadow-accent-blue/20 active:scale-95 border border-white/10"
-              >
-                {isSaved ? <CheckCircle2 size={18} /> : <Send size={18} />}
-                {isSaved ? 'SAVED' : 'SAVE'}
-              </button>
+          <div className="flex flex-col gap-6 p-4 bg-background/40 rounded-[2rem] border border-border-color shadow-sm mt-4">
+            <div className="flex flex-col gap-4">
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-gray-text/30">Chronicle Settings</span>
+
+              <div className="flex flex-col gap-6">
+                {/* Type Selection */}
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs font-black uppercase tracking-widest text-gray-text/40">Entry Type</span>
+
+                  <div className="flex p-1 bg-background/80 rounded-xl border border-border-color shadow-sm w-full">
+                    <button
+                      type="button"
+                      onClick={() => setNoteType('note')}
+                      className={cn(
+                        "flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all",
+                        noteType === 'note' ? 'bg-accent-blue text-white shadow-lg' : 'text-gray-text hover:bg-accent-blue/5'
+                      )}
+                    >
+                      Memo
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNoteType('event')}
+                      className={cn(
+                        "flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all",
+                        noteType === 'event' ? 'bg-orange-500 text-white shadow-lg' : 'text-gray-text hover:bg-orange-500/5'
+                      )}
+                    >
+                      Event
+                    </button>
+                  </div>
+                </div>
+
+                {/* Recurrence Selection */}
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs font-black uppercase tracking-widest text-gray-text/40">Frequency</span>
+
+                  <div className="grid grid-cols-2 p-1 bg-background/80 rounded-xl border border-border-color shadow-sm w-full gap-1">
+                    <button
+                      type="button"
+                      onClick={() => calendar.setRecurrence('none')}
+                      className={cn(
+                        "flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                        calendar.recurrence === 'none' ? 'bg-gray-500 text-white shadow-lg' : 'text-gray-text hover:bg-gray-500/5'
+                      )}
+                    >
+                      Once
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => calendar.setRecurrence('weekly')}
+                      className={cn(
+                        "flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                        calendar.recurrence === 'weekly' ? 'bg-accent-blue text-white shadow-lg' : 'text-gray-text hover:bg-accent-blue/5'
+                      )}
+                    >
+                      Weekly
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => calendar.setRecurrence('monthly')}
+                      className={cn(
+                        "col-span-2 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                        calendar.recurrence === 'monthly' ? 'bg-indigo-500 text-white shadow-lg' : 'text-gray-text hover:bg-indigo-500/5'
+                      )}
+                    >
+                      Monthly
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            <button
+              type="submit"
+              disabled={!activeDate || !localText.trim()}
+              className="w-full flex items-center justify-center gap-3 px-8 py-3 bg-accent-blue hover:bg-accent-blue/90 disabled:opacity-20 text-white rounded-2xl text-xs font-black tracking-[0.2em] transition-all shadow-xl shadow-accent-blue/20 active:scale-95 border border-white/10"
+            >
+              {isSaved ? <CheckCircle2 size={16} /> : <Send size={16} />}
+              {isSaved ? 'SAVED TO TIMELINE' : 'ADD TO TIMELINE'}
+            </button>
+
           </div>
         </form>
       </div>
@@ -184,9 +256,10 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
       <div className="flex-grow flex flex-col gap-10">
         <div>
           <div className="flex items-center gap-4 mb-6">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-text/30">Active Selection History</span>
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-gray-text/30">Active Selection History</span>
             <div className="h-[1px] flex-grow bg-border-color/40" />
           </div>
+
 
           <div className="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
             <AnimatePresence mode="popLayout">
@@ -236,29 +309,8 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
           </div>
         </div>
 
-        {/* Upcoming Section */}
-        <div className="mt-auto border-t border-border-color pt-10">
-          <div className="flex items-center gap-4 mb-6">
-            <Clock size={16} className="text-accent-blue/40" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-text/40">Upcoming in Timeline</span>
-            <div className="h-[1px] flex-grow bg-border-color/40" />
-          </div>
-
-          <div className="flex flex-col gap-3">
-            {upcomingEvents.map((event: any) => (
-              <div key={event.id} className="flex items-center gap-4 group cursor-pointer">
-                <div className="w-14 text-[10px] font-black text-gray-text/40 uppercase tracking-tighter">
-                  {format(parseISO(event.dateKey), 'MMM d')}
-                </div>
-                <div className="flex-grow flex items-center gap-3 p-3 bg-card-bg/20 rounded-2xl border border-border-color/40 group-hover:bg-accent-blue/5 transition-all">
-                  <div className={cn("w-1.5 h-1.5 rounded-full", event.category === 'urgent' ? 'bg-rose-500' : 'bg-gray-500')} />
-                  <p className="text-xs font-bold text-gray-text line-clamp-1">{event.text}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
+
   );
 }

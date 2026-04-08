@@ -13,8 +13,9 @@ export default function Home() {
 
       <Features />
 
-      <section id="calendar" className="py-24 md:py-48 px-6 md:px-12 bg-background/50 relative overflow-hidden">
+      <section id="calendar" className="py-24 md:py-48 px-2 md:px-12 bg-background/50 relative overflow-hidden">
         <div className="absolute inset-0 hero-gradient pointer-events-none opacity-40 rotate-180" />
+
 
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="mb-24 text-center max-w-2xl mx-auto">

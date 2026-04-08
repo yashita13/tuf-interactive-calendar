@@ -3,7 +3,8 @@ import {
   addMonths, subMonths, startOfMonth, endOfMonth, 
   startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth,
   isSameDay, isWithinInterval, differenceInDays, max, min, 
-  setMonth as setDateMonth, setYear as setDateYear
+  setMonth as setDateMonth, setYear as setDateYear, isWeekend as isDateWeekend,
+  format
 } from 'date-fns';
 
 export type SelectionRange = {
@@ -11,18 +12,32 @@ export type SelectionRange = {
   end: Date | null;
 };
 
+// Common Holidays for Calendar Intelligence
+const HOLIDAYS: Record<string, string> = {
+  '01-01': 'New Year\'s Day',
+  '07-04': 'Independence Day',
+  '12-25': 'Christmas',
+  '05-01': 'Labor Day',
+  '10-31': 'Halloween',
+};
+
+export type RecurrenceType = 'none' | 'weekly' | 'monthly';
+
 export function useCalendar(initialDate: Date = new Date()) {
   const [currentDate, setCurrentDate] = useState(initialDate);
   const [selection, setSelection] = useState<SelectionRange>({ start: null, end: null });
   const [hoverDate, setHoverDate] = useState<Date | null>(null);
+  const [focusedDate, setFocusedDate] = useState<Date | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [dragAnchor, setDragAnchor] = useState<Date | null>(null);
+  const [recurrence, setRecurrence] = useState<RecurrenceType>('none');
 
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const goToToday = () => {
     const today = new Date();
     setCurrentDate(today);
-    setSelection({ start: today, end: null });
+    setFocusedDate(today);
   };
 
   const setMonth = (month: number) => setCurrentDate(setDateMonth(currentDate, month));
@@ -35,77 +50,170 @@ export function useCalendar(initialDate: Date = new Date()) {
   }, [currentDate]);
 
   const selectionStats = useMemo(() => {
-    const start = selection.start;
-    const end = isDragging && hoverDate ? (start && hoverDate ? (isSameDay(start, hoverDate) ? start : hoverDate) : start) : selection.end;
-    
-    if (!start) return null;
-    
-    const trueStart = end ? min([start, end]) : start;
-    const trueEnd = end ? max([start, end]) : start;
+    let currentStart = selection.start;
+    let currentEnd = selection.end;
+
+    // During drag, the temporary range is between anchor and hover
+    if (isDragging && dragAnchor && hoverDate) {
+      currentStart = dragAnchor;
+      currentEnd = hoverDate;
+    }
+
+    if (!currentStart) return null;
+
+    const trueStart = currentEnd ? min([currentStart, currentEnd]) : currentStart;
+    const trueEnd = currentEnd ? max([currentStart, currentEnd]) : currentStart;
 
     return {
       start: trueStart,
       end: trueEnd,
       days: differenceInDays(trueEnd, trueStart) + 1
     };
-  }, [selection, hoverDate, isDragging]);
+  }, [selection, hoverDate, isDragging, dragAnchor]);
 
-  const handleDateSelect = useCallback((date: Date, type: 'click' | 'mousedown' | 'mouseenter' | 'mouseup' = 'click') => {
+  const handleDateSelect = useCallback((
+    date: Date, 
+    type: 'click' | 'mousedown' | 'mouseenter' | 'mouseup' | 'keyboard' = 'click',
+    shiftKey: boolean = false
+  ) => {
     if (type === 'mousedown') {
       setIsDragging(true);
-      setSelection({ start: date, end: null });
+      setDragAnchor(date);
       setHoverDate(date);
+      setFocusedDate(date);
       return;
     }
 
-    if (type === 'mouseenter' && isDragging) {
-      setHoverDate(date);
-      return;
-    }
-
-    if (type === 'mouseup' && isDragging) {
-      setIsDragging(false);
-      if (selection.start && !isSameDay(date, selection.start)) {
-        const start = min([selection.start, date]);
-        const end = max([selection.start, date]);
-        setSelection({ start, end });
+    if (type === 'mouseenter') {
+      if (isDragging) {
+        setHoverDate(date);
       }
-      setHoverDate(null);
+      setFocusedDate(date);
       return;
     }
 
-    if (type === 'click' && !isDragging) {
-      setSelection(prev => {
-        if (!prev.start) return { start: date, end: null };
-        if (prev.start && !prev.end) {
-          if (isSameDay(date, prev.start)) return { start: null, end: null };
-          return { start: min([prev.start, date]), end: max([prev.start, date]) };
+    if (type === 'mouseup') {
+      if (isDragging) {
+        setIsDragging(false);
+        const anchor = dragAnchor;
+        
+        if (anchor && !isSameDay(date, anchor)) {
+          // Range Drag Finalized
+          setSelection({
+            start: min([anchor, date]),
+            end: max([anchor, date])
+          });
+        } else {
+          // Single Day Click (detected via mouseup)
+          setSelection(prev => {
+            // If starting fresh or resetting after full selection
+            if (!prev.start || (prev.start && prev.end)) return { start: date, end: null };
+            // Second click logic
+            if (isSameDay(date, prev.start)) return { start: null, end: null };
+            return {
+              start: min([prev.start, date]),
+              end: max([prev.start, date])
+            };
+          });
         }
-        return { start: date, end: null };
-      });
+        setDragAnchor(null);
+        setHoverDate(null);
+      }
+      return;
     }
-  }, [isDragging, selection]);
+
+    if (type === 'keyboard') {
+      setFocusedDate(date);
+      if (shiftKey) {
+        setSelection(prev => {
+          const start = prev.start || date;
+          return {
+            start: start,
+            end: date
+          };
+        });
+      }
+      return;
+    }
+
+    if (type === 'click') {
+      // Direct click (if mouseup didn't fire or separate handler)
+      setSelection(prev => {
+        if (!prev.start || (prev.start && prev.end)) return { start: date, end: null };
+        if (isSameDay(date, prev.start)) return { start: null, end: null };
+        return {
+          start: min([prev.start, date]),
+          end: max([prev.start, date])
+        };
+      });
+      setFocusedDate(date);
+    }
+  }, [isDragging, dragAnchor, setSelection, setIsDragging]);
 
   const getDayStatus = useCallback((date: Date) => {
     const isCurrentMonth = isSameMonth(date, currentDate);
     const isToday = isSameDay(date, new Date());
+    const isFocused = isSameDay(date, focusedDate || new Date(0));
+    const isWeekend = isDateWeekend(date);
+    
+    const monthDay = format(date, 'MM-dd');
+    const isHoliday = HOLIDAYS[monthDay] || null;
     
     let isSelectedStart = false;
     let isSelectedEnd = false;
     let isSelectedRange = false;
     let isHovered = isSameDay(date, hoverDate || new Date(0));
 
-    const start = selection.start;
-    const end = isDragging && hoverDate ? hoverDate : selection.end;
+    let start = selection.start;
+    let end = selection.end;
+
+    // Preview range during dragging
+    if (isDragging && dragAnchor && hoverDate) {
+      start = dragAnchor;
+      end = hoverDate;
+    }
 
     if (start) {
-      isSelectedStart = isSameDay(date, start);
-      if (end) {
-        isSelectedEnd = isSameDay(date, end);
-        const trueStart = min([start, end]);
-        const trueEnd = max([start, end]);
-        if (isWithinInterval(date, { start: trueStart, end: trueEnd })) {
-          isSelectedRange = true;
+      const trueStart = end ? min([start, end]) : start;
+      const trueEnd = end ? max([start, end]) : start;
+
+      isSelectedStart = isSameDay(date, trueStart);
+      isSelectedEnd = isSameDay(date, trueEnd);
+
+      if (isWithinInterval(date, { start: trueStart, end: trueEnd })) {
+        isSelectedRange = true;
+      }
+    }
+
+    // Recurrence Logic
+    let isWeeklyRecurrence = false;
+    let isMonthlyRecurrence = false;
+
+    if (selection.start && recurrence !== 'none') {
+      const selStart = selection.start;
+      const selEnd = selection.end || selection.start;
+      const trueSelStart = min([selStart, selEnd]);
+      const trueSelEnd = max([selStart, selEnd]);
+
+      if (recurrence === 'weekly') {
+        const startDayIdx = trueSelStart.getDay();
+        const endDayIdx = trueSelEnd.getDay();
+        const currentDayIdx = date.getDay();
+
+        // Handle case where selection spans multiple days in a week
+        if (startDayIdx <= endDayIdx) {
+          isWeeklyRecurrence = currentDayIdx >= startDayIdx && currentDayIdx <= endDayIdx;
+        } else {
+          // Wrapped selection (though usually min/max prevents this, safety check)
+          isWeeklyRecurrence = currentDayIdx >= startDayIdx || currentDayIdx <= endDayIdx;
+        }
+      } else if (recurrence === 'monthly') {
+        const startDayNum = trueSelStart.getDate();
+        const endDayNum = trueSelEnd.getDate();
+        const currentDayNum = date.getDate();
+
+        if (startDayNum <= endDayNum) {
+          isMonthlyRecurrence = currentDayNum >= startDayNum && currentDayNum <= endDayNum;
         }
       }
     }
@@ -117,24 +225,35 @@ export function useCalendar(initialDate: Date = new Date()) {
       isSelectedEnd,
       isSelectedRange,
       isHovered,
-      isDragging
+      isDragging,
+      isFocused,
+      isWeekend,
+      isHoliday,
+      isWeeklyRecurrence,
+      isMonthlyRecurrence
     };
-  }, [currentDate, selection, hoverDate, isDragging]);
+  }, [currentDate, selection, hoverDate, isDragging, focusedDate, dragAnchor, recurrence]);
 
   return {
     currentDate,
     selection,
     selectionStats,
     hoverDate,
+    focusedDate,
     isDragging,
+    recurrence,
     nextMonth,
     prevMonth,
     goToToday,
     setMonth,
     setYear,
+    setRecurrence,
     getDaysInMonth,
     handleDateSelect,
     getDayStatus,
     setHoverDate,
+    setSelection
   };
 }
+
+

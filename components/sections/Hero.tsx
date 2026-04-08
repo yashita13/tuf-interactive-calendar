@@ -66,18 +66,19 @@ export function Hero() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-15">
             <Link
               href="#calendar"
-              className="group relative px-10 py-5 bg-accent-blue hover:bg-accent-blue/90 text-white rounded-[1.25rem] font-black uppercase tracking-widest text-[11px] transition-all shadow-2xl shadow-accent-blue/40 active:scale-95 flex items-center gap-3 overflow-hidden"
+              className="group relative px-10 py-5 bg-accent-blue hover:bg-accent-blue/90 text-white rounded-[1.25rem] font-black uppercase tracking-widest text-base transition-all shadow-2xl shadow-accent-blue/40 active:scale-95 flex items-center gap-3 overflow-hidden"
             >
               <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none skew-x-12" />
-              <MousePointer2 size={16} />
+              <MousePointer2 size={18} />
               Start Planning
             </Link>
             <Link
               href="#features"
-              className="px-10 py-5 bg-background/50 backdrop-blur-md border border-border-color hover:bg-background/80 text-foreground rounded-[1.25rem] font-black uppercase tracking-widest text-[11px] transition-all active:scale-95"
+              className="px-10 py-5 bg-background/50 backdrop-blur-md border border-border-color hover:bg-background/80 text-foreground rounded-[1.25rem] font-black uppercase tracking-widest text-base transition-all active:scale-95"
             >
               Discover
             </Link>
+
           </div>
         </motion.div>
       </div>

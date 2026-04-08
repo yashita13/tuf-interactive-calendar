@@ -109,13 +109,14 @@ const FeatureRow = ({ feature, index }: { feature: Feature; index: number }) => 
             <feature.icon size={32} />
           </motion.div>
 
-          <h2 className="text-4xl md:text-7xl font-bold tracking-tighter font-heading text-foreground">
+          <h2 className="text-5xl md:text-7xl font-bold tracking-tighter font-heading text-foreground">
             {feature.title}
           </h2>
 
-          <p className="text-lg md:text-xl text-gray-text leading-relaxed max-w-xl font-medium mx-auto md:mx-0">
+          <p className="text-xl md:text-2xl text-gray-text leading-relaxed max-w-xl font-medium mx-auto md:mx-0">
             {feature.description}
           </p>
+
 
           {/* <motion.button
             animate={isInView ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }}
@@ -181,13 +182,13 @@ const FeatureRow = ({ feature, index }: { feature: Feature; index: number }) => 
           </motion.div>
 
           {/* Floating tags */}
-          {/* <motion.div
+          <motion.div
             animate={isInView ? { x: 0, opacity: 1 } : { x: 20, opacity: 0 }}
             transition={{ delay: 0.3 }}
             className="absolute -top-4 -right-4 p-4 bg-accent-blue/10 backdrop-blur-md border border-accent-blue/20 rounded-2xl shadow-xl z-30"
           >
-            <div className="text-xs font-bold text-accent-blue uppercase tracking-widest">Advanced</div>
-          </motion.div> */}
+            <div className="text-xs font-bold text-accent-blue uppercase tracking-widest">Features</div>
+          </motion.div>
         </div>
       </div>
     </motion.div>

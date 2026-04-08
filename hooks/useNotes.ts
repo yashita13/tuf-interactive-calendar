@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { isSameMonth, parseISO } from 'date-fns';
+import { 
+  isSameMonth, parseISO, isSameDay, eachDayOfInterval, 
+  format, getDay, getDate 
+} from 'date-fns';
 
 export type NoteType = 'note' | 'event';
 export type NoteCategory = 'work' | 'personal' | 'urgent' | 'general';
@@ -28,7 +31,7 @@ export function useNotes() {
         console.error('Failed to parse notes');
       }
     } else {
-      // Seed sample data for first-time viewers
+      // Seed sample data
       const today = new Date();
       const month = today.getMonth() + 1;
       const year = today.getFullYear();
@@ -54,18 +57,9 @@ export function useNotes() {
           createdAt: new Date(`${year}-${pad(month)}-01T14:30:00`).getTime()
         },
         {
-          id: 'sample-3',
-          dateKey: `${year}-${pad(month)}-07`,
-          text: 'Weekly Sync with lead designer.',
-          type: 'event',
-          category: 'work',
-          recurrence: 'weekly',
-          createdAt: new Date(`${year}-${pad(month)}-07T11:00:00`).getTime()
-        },
-        {
           id: 'sample-4',
           dateKey: `${year}-${pad(month)}-15`,
-          text: 'Personal meditation and focus session.',
+          text: 'Personal focus session.',
           type: 'note',
           category: 'personal',
           recurrence: 'none',
@@ -83,17 +77,46 @@ export function useNotes() {
     localStorage.setItem('calendar-notes', JSON.stringify(newNotes));
   };
 
-  const addNote = useCallback((dateKey: string, text: string, type: NoteType = 'note', category: NoteCategory = 'general', recurrence: RecurrenceType = 'none') => {
-    const newNote: Note = {
-      id: crypto.randomUUID(),
-      dateKey,
-      text,
-      type,
-      category,
-      recurrence,
-      createdAt: Date.now()
-    };
-    saveNotes([...notes, newNote]);
+  const addNote = useCallback((
+    dateKey: string, 
+    text: string, 
+    type: NoteType = 'note', 
+    category: NoteCategory = 'general', 
+    recurrence: RecurrenceType = 'none',
+    endDateKey?: string
+  ) => {
+    const newNotesToAdd: Note[] = [];
+    
+    if (endDateKey && endDateKey !== dateKey) {
+      const interval = eachDayOfInterval({ 
+        start: parseISO(dateKey), 
+        end: parseISO(endDateKey) 
+      });
+      
+      interval.forEach(date => {
+        newNotesToAdd.push({
+          id: crypto.randomUUID(),
+          dateKey: format(date, 'yyyy-MM-dd'),
+          text,
+          type,
+          category,
+          recurrence: 'none', // Range notes don't recur individually usually
+          createdAt: Date.now()
+        });
+      });
+    } else {
+      newNotesToAdd.push({
+        id: crypto.randomUUID(),
+        dateKey,
+        text,
+        type,
+        category,
+        recurrence,
+        createdAt: Date.now()
+      });
+    }
+
+    saveNotes([...notes, ...newNotesToAdd]);
   }, [notes]);
 
   const updateNote = useCallback((id: string, text: string, type?: NoteType, category?: NoteCategory) => {
@@ -108,36 +131,61 @@ export function useNotes() {
   }, [notes]);
 
   const getNotesForDate = useCallback((dateKey: string) => {
-    return notes.filter(n => n.dateKey === dateKey);
+    const date = parseISO(dateKey);
+    return notes.filter(n => {
+      // Direct match
+      if (n.dateKey === dateKey) return true;
+      
+      // Recurrence match (only if note is in the past or on the same day)
+      if (n.dateKey > dateKey) return false;
+      
+      if (n.recurrence === 'weekly') {
+        return getDay(parseISO(n.dateKey)) === getDay(date);
+      }
+      if (n.recurrence === 'monthly') {
+        return getDate(parseISO(n.dateKey)) === getDate(date);
+      }
+      
+      return false;
+    });
   }, [notes]);
 
   const hasNotes = useCallback((dateKey: string) => {
-    return notes.some(n => n.dateKey === dateKey && n.type === 'note');
-  }, [notes]);
+    return getNotesForDate(dateKey).some(n => n.type === 'note');
+  }, [getNotesForDate]);
 
   const hasEvents = useCallback((dateKey: string) => {
-    return notes.some(n => n.dateKey === dateKey && n.type === 'event');
-  }, [notes]);
+    return getNotesForDate(dateKey).some(n => n.type === 'event');
+  }, [getNotesForDate]);
 
-  // Analytics for a specific month
   const getMonthlyStats = useCallback((currentMonth: Date) => {
     const monthlyNotes = notes.filter(n => 
       isSameMonth(parseISO(n.dateKey), currentMonth)
     );
     
+    // Categorize activity patterns
+    const categories = {
+      work: monthlyNotes.filter(n => n.category === 'work').length,
+      personal: monthlyNotes.filter(n => n.category === 'personal').length,
+      urgent: monthlyNotes.filter(n => n.category === 'urgent').length,
+    };
+
+    const mostActiveCategory = Object.entries(categories).reduce((a, b) => b[1] > a[1] ? b : a)[0];
+
     return {
       totalNotes: monthlyNotes.filter(n => n.type === 'note').length,
       totalEvents: monthlyNotes.filter(n => n.type === 'event').length,
       totalEntries: monthlyNotes.length,
-      workCount: monthlyNotes.filter(n => n.category === 'work').length,
-      personalCount: monthlyNotes.filter(n => n.category === 'personal').length,
-      urgentCount: monthlyNotes.filter(n => n.category === 'urgent').length,
+      workCount: categories.work,
+      personalCount: categories.personal,
+      urgentCount: categories.urgent,
+      mostActiveCategory
     };
   }, [notes]);
 
   const upcomingEvents = useMemo(() => {
     const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
+    const todayStr = format(today, 'yyyy-MM-dd');
     return notes
       .filter(n => n.dateKey >= todayStr)
       .sort((a,b) => a.dateKey.localeCompare(b.dateKey))
@@ -157,3 +205,4 @@ export function useNotes() {
     upcomingEvents
   };
 }
+
