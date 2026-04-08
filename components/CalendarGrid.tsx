@@ -25,8 +25,10 @@ interface CalendarGridProps {
 export function CalendarGrid({ calendar, notesStore }: CalendarGridProps) {
   const {
     currentDate, nextMonth, prevMonth, goToToday, setMonth: jumpMonth, setYear: jumpYear,
-    getDaysInMonth, getDayStatus, handleDateSelect, selection, focusedDate, setSelection
+    getDaysInMonth, getDayStatus, handleDateSelect, selection, focusedDate, setSelection,
+    prevDateRef
   } = calendar;
+
 
   const days = getDaysInMonth;
 
@@ -210,16 +212,45 @@ export function CalendarGrid({ calendar, notesStore }: CalendarGridProps) {
         ))}
       </div>
 
-      {/* Days grid with Flip/Animation */}
-      <div className="relative overflow-hidden min-h-[300px]">
-        <AnimatePresence mode="wait">
+      <div className="relative overflow-hidden min-h-[350px] [perspective:1200px] py-4" style={{ transformStyle: 'preserve-3d' }}>
+        <AnimatePresence mode="popLayout" custom={currentDate > (prevDateRef?.current || currentDate)}>
           <motion.div
-            key={currentDate.toString()}
-            initial={{ opacity: 0, x: 20, rotateY: 15 }}
-            animate={{ opacity: 1, x: 0, rotateY: 0 }}
-            exit={{ opacity: 0, x: -20, rotateY: -15 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="grid grid-cols-7 gap-1 sm:gap-4 relative"
+            key={format(currentDate, 'MMM-yyyy')}
+            custom={currentDate > (prevDateRef?.current || currentDate)}
+            variants={{
+              initial: (isForward: boolean) => ({
+                opacity: 0,
+                rotateY: isForward ? 45 : -45,
+                x: isForward ? 40 : -40,
+                scale: 0.95,
+                filter: "blur(4px)"
+              }),
+              animate: {
+                opacity: 1,
+                rotateY: 0,
+                x: 0,
+                scale: 1,
+                filter: "blur(0px)",
+                transition: {
+                  type: 'spring',
+                  stiffness: 300,
+                  damping: 30,
+                  duration: 0.6
+                }
+              },
+              exit: (isForward: boolean) => ({
+                opacity: 0,
+                rotateY: isForward ? -45 : 45,
+                x: isForward ? -40 : 40,
+                scale: 0.95,
+                filter: "blur(4px)",
+                transition: { duration: 0.4 }
+              })
+            }}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="grid grid-cols-7 gap-1 sm:gap-4 relative backface-hidden"
             onMouseUp={() => calendar.handleDateSelect(focusedDate || currentDate, 'mouseup')}
           >
             {days.map((date, i) => (
@@ -236,7 +267,7 @@ export function CalendarGrid({ calendar, notesStore }: CalendarGridProps) {
         </AnimatePresence>
       </div>
 
+
     </div>
   );
 }
-

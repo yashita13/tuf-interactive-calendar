@@ -1,4 +1,5 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+
 import { 
   addMonths, subMonths, startOfMonth, endOfMonth, 
   startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth,
@@ -31,6 +32,12 @@ export function useCalendar(initialDate: Date = new Date()) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragAnchor, setDragAnchor] = useState<Date | null>(null);
   const [recurrence, setRecurrence] = useState<RecurrenceType>('none');
+  const prevDateRef = useRef<Date>(currentDate);
+
+  useEffect(() => {
+    prevDateRef.current = currentDate;
+  }, [currentDate]);
+
 
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
@@ -252,8 +259,10 @@ export function useCalendar(initialDate: Date = new Date()) {
     handleDateSelect,
     getDayStatus,
     setHoverDate,
-    setSelection
+    setSelection,
+    prevDateRef
   };
 }
+
 
 

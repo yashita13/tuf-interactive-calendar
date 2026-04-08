@@ -9,6 +9,9 @@ import { ImageSection } from '@/components/ImageSection';
 import { format, parseISO } from 'date-fns';
 import { Calendar as CalendarIcon, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ExportModal } from './ExportModal';
+import { Download } from 'lucide-react';
+
 
 export function WallCalendar() {
   const calendar = useCalendar();
@@ -18,6 +21,8 @@ export function WallCalendar() {
   const monthlyStats = notesStore.getMonthlyStats(currentDate);
 
   const [accentColor, setAccentColor] = useState('#308be7');
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
 
   useEffect(() => {
     document.documentElement.style.setProperty('--accent-blue', accentColor);
@@ -110,7 +115,9 @@ export function WallCalendar() {
 
           <div className="h-8 w-[1px] bg-border-color hidden sm:block" />
 
-          <div className="flex items-center gap-8 font-heading">
+
+            <div className="flex items-center gap-8 font-heading">
+
             <div className="flex flex-col items-center">
               <span className="text-xs font-black uppercase tracking-[0.2em] text-gray-text/30">Memos</span>
               <span className="text-2xl font-bold text-accent-blue leading-none mt-1">{monthlyStats.totalNotes}</span>
@@ -134,6 +141,7 @@ export function WallCalendar() {
 
         </div>
       </div>
+
 
       <motion.div
         initial={{ opacity: 0, scale: 0.98, y: 20 }}
@@ -236,7 +244,28 @@ export function WallCalendar() {
         </div>
       </motion.div>
 
-      <p className="text-sm font-medium">Tip: Click a start and end date to select a range.</p>
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 px-2">
+        <p className="text-sm font-medium text-gray-text/60 italic">Tip: Click a start and end date to select a range.</p>
+        
+        <button
+          onClick={() => setIsExportModalOpen(true)}
+          className="flex items-center gap-2 px-6 py-2.5 bg-accent-blue text-white rounded-xl text-xs font-black uppercase tracking-[0.2em] shadow-lg shadow-accent-blue/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-20 disabled:pointer-events-none disabled:grayscale"
+          disabled={!selectionStats}
+          title={!selectionStats ? "Select a range to export" : "Export timeline"}
+        >
+          <Download size={14} className="animate-bounce" />
+          <span>Export Timeline</span>
+        </button>
+      </div>
+
+
+      <ExportModal 
+        isOpen={isExportModalOpen} 
+        onClose={() => setIsExportModalOpen(false)}
+        calendar={calendar}
+        notesStore={notesStore}
+      />
     </div>
+
   );
 }
