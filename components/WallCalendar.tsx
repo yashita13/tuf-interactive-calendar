@@ -165,10 +165,12 @@ export function WallCalendar() {
         <ImageSection currentDate={calendar.currentDate} />
 
         <div className="flex flex-col-reverse md:flex-row w-full divide-y md:divide-y-0 md:divide-x divide-border-color transition-colors duration-500">
-          <div className="w-full md:w-5/12 px-4 py-8 md:p-14 shrink-0 bg-background/20 transition-colors duration-500">
+          <div className="w-full md:w-5/12 px-4 pt-2 pb-8 md:p-14 shrink-0 bg-background/20 transition-colors duration-500">
+
             <NotesPanel calendar={calendar} notesStore={notesStore} />
           </div>
-          <div className="w-full md:w-7/12 px-1 py-6 md:p-14 flex flex-col justify-start bg-card-bg transition-colors duration-500">
+          <div className="w-full md:w-7/12 px-1 pt-6 pb-2 md:p-14 flex flex-col justify-start bg-card-bg transition-colors duration-500">
+
             <CalendarGrid calendar={calendar} notesStore={notesStore} />
 
             {/* INTEGRATED SIDEBAR ROADMAP (Desktop Only) */}

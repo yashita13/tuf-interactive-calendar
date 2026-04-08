@@ -91,7 +91,8 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
 
   return (
     <div className="w-full h-full flex flex-col group min-h-[500px] md:min-h-[700px] transition-all">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-4 md:mb-8">
+
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-accent-blue/10 rounded-xl flex items-center justify-center text-accent-blue border border-accent-blue/20">
             <Edit3 size={20} />
@@ -104,7 +105,8 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
-          className="mb-8 p-4 bg-background/40 rounded-2xl border border-border-color border-dashed"
+          className="mb-4 md:mb-8 p-4 bg-background/40 rounded-2xl border border-border-color border-dashed"
+
         >
           <div className="flex flex-col gap-1">
             <span className="text-xs font-black uppercase tracking-[0.2em] text-accent-blue/60 mb-1">Targeted Timeline</span>
@@ -121,7 +123,8 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
       )}
 
       {/* Note Editor */}
-      <div className="relative mb-10">
+      <div className="relative mb-6 md:mb-10">
+
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="relative flex-grow bg-background/60 backdrop-blur-sm rounded-2xl p-6 border border-border-color shadow-2xl transition-all focus-within:border-accent-blue/40 focus-within:ring-1 focus-within:ring-accent-blue/20">
             <textarea
@@ -129,7 +132,8 @@ export function NotesPanel({ calendar, notesStore }: NotesPanelProps) {
               value={localText}
               onChange={(e) => setLocalText(e.target.value)}
               placeholder="What's happening in this timeline? (e.g. 'Project sync', 'Gym session')..."
-              className="w-full min-h-[140px] bg-transparent resize-none focus:outline-none text-base text-foreground leading-relaxed font-medium placeholder:text-gray-text/20 transition-all z-10"
+              className="w-full min-h-[80px] md:min-h-[140px] bg-transparent resize-none focus:outline-none text-base text-foreground leading-relaxed font-medium placeholder:text-gray-text/20 transition-all z-10"
+
             />
             {localText.length > 0 && (
               <div className="absolute top-4 right-4 animate-in fade-in zoom-in duration-300">
