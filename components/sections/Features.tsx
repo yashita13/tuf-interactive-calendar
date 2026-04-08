@@ -5,10 +5,11 @@ import { useRef } from "react";
 import {
   Settings,
   MousePointer2,
-  BarChart3,
-  Palette,
+  StickyNote,
   Zap,
-  LucideIcon
+  LucideIcon,
+  Download,
+  BarChart3
 } from "lucide-react";
 
 interface Feature {
@@ -21,26 +22,32 @@ interface Feature {
 const features: Feature[] = [
   {
     icon: MousePointer2,
-    title: "Intelligent Range Selection",
-    description: "Select date ranges with click, drag, or keyboard input. Includes live preview, reverse selection handling, and automatic duration calculation.",
+    title: "Precision Range Selection",
+    description: "Select date ranges with Click, Drag, or Keyboard with real-time preview, reverse handling, and instant duration feedback.",
     color: "#3b82f6" // accent-blue
   },
   {
-    icon: BarChart3,
-    title: "Smart Notes & Event System",
-    description: "Attach categorized notes (Work, Personal, Urgent) to single dates or ranges. Supports recurring events and real-time persistence.",
+    icon: StickyNote,
+    title: "Smart Notes & Recurring Events",
+    description: "Attach categorized notes (Work, Personal, Urgent) to single dates or ranges. Supports monthly and weekly recurrence.",
     color: "#f97316" // orange-500
   },
   {
-    icon: Palette,
-    title: "Calendar Intelligence",
-    description: "Automatically highlights weekends and holidays, with quick navigation using Today button and month/year selector.",
-    color: "#8b5cf6" // violet-500
+    icon: Download,
+    title: "Exportable Timeline",
+    description: "Export selected ranges and notes into clean, shareable images or PDFs.",
+    color: "#eab308" // yellow-500
   },
   {
     icon: Zap,
-    title: "Real-Time Insights",
-    description: "Track usage with built-in analytics including selected days, notes count, and monthly activity patterns.",
+    title: "Page Flip Navigation",
+    description: "Switch months with a smooth, realistic page-flip animation for a tactile calendar experience.",
+    color: "#8b5cf6" // violet-500
+  },
+  {
+    icon: BarChart3,
+    title: "Fluid Interaction System",
+    description: "Experience smooth micro-interactions including drag selection, hover previews, and animated range transitions.",
     color: "#10b981" // emerald-500
   }
 ];
