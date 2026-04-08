@@ -12,10 +12,15 @@ Chronicle was built to solve the "Interaction Gap" in digital planning. Instead 
 ### 🚀 High-Impact Technical Features
 | Feature | Implementation | UX Benefit |
 | :--- | :--- | :--- |
-| **3D Page Flip** | Framer Motion Viewport-Aware Navigation | Physical feel, reduces "context shock" on month jump. |
-| **Logic-Aware Selection** | Multi-State (Click, Drag, Shift+Key) | Accommodates pros and casual users alike. |
-| **Vector-PDF Export** | `jsPDF` + `html-to-image` | High-fidelity data portability without server-side lag. |
-| **Fluid Responsiveness** | Adaptive Grid Inversion (Order Switch) | Information density remains optimal across Mobile/Desktop. |
+| **3D Page Flip Navigation** | Framer Motion + perspective transforms | Physical feel while switching months |
+| **Precision Range Engine** | Click, Drag, Keyboard + reverse logic | Flexible and intuitive selection |
+| **Live Range Preview** | Hover + drag tracking | Instant feedback before selection |
+| **Recurring Timeline Engine** | Weekly & Monthly logic | Supports habits and repeated planning |
+| **Dynamic Selection Feedback** | Real-time duration + date display | Improves clarity and confidence |
+| **Exportable Timeline** | `html-to-image` + `jsPDF` | Shareable, real-world utility |
+| **Adaptive Accent Themes** | CSS variables + runtime injection | Personalized visual experience |
+| **Fluid Interaction System** | Micro-interactions + transitions | Premium UX feel |
+| **Fluid Responsiveness** | Adaptive layout switching | Optimized across all devices |
 
 ---
 
