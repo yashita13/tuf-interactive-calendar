@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌓 Chronicle: The Premium Interactive Timeline Engine
 
-## Getting Started
+> "Precision planning meets tactile elegance."
 
-First, run the development server:
+Chronicle is a high-performance, dark-mode-first calendar application designed for the modern documentation specialist. It bridges the gap between a static calendar and a dynamic project timeline, offering a high-density "Neo-Glassmorphic" interface powered by Next.js and Tailwind CSS.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 💎 Core Vision
+Chronicle was built to solve the "Interaction Gap" in digital planning. Instead of clunky forms and rigid grids, it offers a physics-based experience where every date selection feels meaningful and every month change feels tactile.
+
+### 🚀 High-Impact Technical Features
+| Feature | Implementation | UX Benefit |
+| :--- | :--- | :--- |
+| **3D Page Flip** | Framer Motion Viewport-Aware Navigation | Physical feel, reduces "context shock" on month jump. |
+| **Logic-Aware Selection** | Multi-State (Click, Drag, Shift+Key) | Accommodates pros and casual users alike. |
+| **Vector-PDF Export** | `jsPDF` + `html-to-image` | High-fidelity data portability without server-side lag. |
+| **Fluid Responsiveness** | Adaptive Grid Inversion (Order Switch) | Information density remains optimal across Mobile/Desktop. |
+
+---
+
+## 🏗️ Architectural Component Breakdown
+
+### 1. `WallCalendar.tsx` (The Command Center)
+The central architecture of the app. It manages the layout shift between Desktop (7:5 Split) and Mobile (Inverted Stack).
+- **Desktop Logic**: Dates on RHS, Notes on LHS. Roadmap integrated into RHS Sidebar.
+- **Mobile Logic**: Dates (Top) → Entry Panel (Middle) → History → Roadmap (Bottom).
+- **Global Theme Injection**: Dynamically calculates and injects CSS variables for Accent colors (Classic, Emerald, Rose, etc.).
+
+### 2. `CalendarGrid.tsx` (The Engine)
+A high-frequency interaction component that handles the heavy lifting of date math and animations.
+- **3D Animation Engine**: Uses `AnimatePresence` with `rotateY` transforms. It detects the *direction* of time (Forward/Backward) to flip the page correctly.
+- **Perspective Projection**: A `1200px` CSS perspective is applied to the grid container to give the 3D transforms depth and weight.
+
+### 3. `NotesPanel.tsx` (The Chronicler)
+A dense information hub for recording events and memos.
+- **Smart Suggestions**: Real-time text parsing detects keywords (e.g., "fitness," "urgent," "meeting") to auto-suggest categories.
+- **Multi-Temporal Recording**: Supports single-day notes and multi-day timeline spans with duration calculation.
+- **Recurrence Support**: Options for Weekly and Monthly persistence.
+
+---
+
+## 📱 Mobile-First Design Philosophy
+Chronicle doesn't just "squish" for mobile; it reconfigures its hierarchy.
+
+```mermaid
+graph TD
+    A[Desktop Layout] --> B[LHS: Entry History]
+    A --> C[RHS: Calendar Grid]
+    A --> D[RHS: Roadmap Sidebar]
+    
+    E[Mobile Layout] --> F[Top: Calendar Grid]
+    F --> G[Middle: Entry Panel]
+    G --> H[Bottom-Middle: History]
+    H --> I[Bottom: Roadmap Footer]
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Mobile Optimizations:
+- **Root Scale**: The app is tuned for a `12px` font root scale for maximum density.
+- **Aspect-Ratio Cells**: Calendar cells use `aspect-square` instead of fixed heights to fill mobile screen widths edge-to-edge.
+- **Information Density**: Spacing between the grid and textbox was reduced by 60% on mobile to keep "Action and Context" within a single viewport scroll.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🎨 Design System & UI/UX
 
-## Learn More
+### Neo-Glassmorphism
+Chronicle utilizes a proprietary "Deep Midnight" design system:
+- **Surface**: `rgba(18, 18, 20, 0.4)` with `40px` backdrop-blur.
+- **Borders**: `rgba(255, 255, 255, 0.05)` with `ring-1` reinforcement.
+- **Shadows**: Large `0 30px 100px` ambient occlusions to separate the card from the depth of the landing page background.
 
-To learn more about Next.js, take a look at the following resources:
+### Typography Hierarchy
+| Level | Size | Weight | Use Case |
+| :--- | :--- | :--- | :--- |
+| **H1 (Hero)** | 4xl | 900+ | Month Names, Section Titles |
+| **Functional Label**| xs | 900 | Stats, Chronicle Settings, Sidebar Labels |
+| **Body Content** | sm/base| 500 | Note text, feature descriptions |
+| **Utility Tip** | sm | 500 | Footer hints, italicized help |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Advanced Logic & Interactions
 
-## Deploy on Vercel
+### The Range Engine
+The calendar uses a sophisticated selection state machine:
+1. **Idle State**: No selection.
+2. **Anchor State**: User has clicked a start date; hover previews the duration.
+3. **Committed State**: Start and End are locked. Duration is calculated.
+4. **Reverse Handling**: If a user drags "backward" in time, the engine automatically swaps the anchor to ensure valid `date-fns` intervals.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📥 Getting Started
+
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/yashita13/tuf-interactive-calendar.git
+
+# Install dependencies
+npm install
+
+# Run the development server
+npm run dev
+```
+
+### Tech Stack
+- **Framework**: Next.js 16 (Turbopack)
+- **Styling**: Tailwind CSS v4
+- **Animation**: Framer Motion
+- **Icons**: Lucide React
+- **Export Engine**: `html-to-image`, `jsPDF`
+- **Date Math**: `date-fns`
+
+---
+
+## 🔮 Future Roadmap
+- [ ] **Cloud Persistence**: Move from `localNotes` state to Supabase/PostgreSQL.
+- [ ] **Team Collaboration**: Shared read-only timelines for project management.
+- [ ] **Advanced Analytics**: Visual graphs of activity patterns based on categories.
+
+---
+Built with 💙 for the TUF Interactive Calendar Challenge.
