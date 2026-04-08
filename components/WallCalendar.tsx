@@ -116,7 +116,7 @@ export function WallCalendar() {
           <div className="h-8 w-[1px] bg-border-color hidden sm:block" />
 
 
-            <div className="flex items-center gap-8 font-heading">
+          <div className="flex items-center gap-8 font-heading">
 
             <div className="flex flex-col items-center">
               <span className="text-xs font-black uppercase tracking-[0.2em] text-gray-text/30">Memos</span>
@@ -165,11 +165,13 @@ export function WallCalendar() {
         <ImageSection currentDate={calendar.currentDate} />
 
         <div className="flex flex-col-reverse md:flex-row w-full divide-y md:divide-y-0 md:divide-x divide-border-color transition-colors duration-500">
-          <div className="w-full md:w-5/12 px-4 pt-2 pb-8 md:p-14 shrink-0 bg-background/20 transition-colors duration-500">
+          <div className="w-full md:w-5/12 px-4 pt-1 pb-8 md:p-14 shrink-0 bg-background/20 transition-colors duration-500">
+
 
             <NotesPanel calendar={calendar} notesStore={notesStore} />
           </div>
-          <div className="w-full md:w-7/12 px-1 pt-6 pb-2 md:p-14 flex flex-col justify-start bg-card-bg transition-colors duration-500">
+          <div className="w-full md:w-7/12 px-1 pt-6 pb-1 md:p-14 flex flex-col justify-start bg-card-bg transition-colors duration-500">
+
 
             <CalendarGrid calendar={calendar} notesStore={notesStore} />
 
@@ -177,7 +179,7 @@ export function WallCalendar() {
             <div className="hidden md:block mt-12 pt-10 border-t border-border-color/60">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-8 h-8 rounded-lg bg-accent-blue/10 flex items-center justify-center text-accent-blue/60">
-                   <Info size={16} />
+                  <Info size={16} />
                 </div>
                 <span className="text-xs font-black uppercase tracking-[0.3em] text-gray-text/40">Future Roadmap</span>
                 <div className="h-[1px] flex-grow bg-gradient-to-r from-border-color/60 to-transparent" />
@@ -185,8 +187,8 @@ export function WallCalendar() {
 
               <div className="grid grid-cols-2 gap-4">
                 {notesStore.upcomingEvents.slice(0, 4).map((event: any) => (
-                  <motion.div 
-                    key={event.id} 
+                  <motion.div
+                    key={event.id}
                     whileHover={{ x: 4 }}
                     className="flex items-center gap-4 p-4 rounded-2xl bg-background/40 border border-border-color/40 hover:border-accent-blue/20 hover:bg-accent-blue/[0.02] transition-all shadow-sm"
                   >
@@ -215,7 +217,7 @@ export function WallCalendar() {
           <div className="md:col-start-6 md:col-span-7 p-8 md:p-14">
             <div className="flex items-center gap-4 mb-8">
               <div className="w-8 h-8 rounded-lg bg-accent-blue/10 flex items-center justify-center text-accent-blue">
-                 <Info size={16} />
+                <Info size={16} />
               </div>
               <span className="text-xs font-black uppercase tracking-[0.3em] text-gray-text/40">Future Roadmap</span>
               <div className="h-[1px] flex-grow bg-gradient-to-r from-border-color to-transparent" />
@@ -223,8 +225,8 @@ export function WallCalendar() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {notesStore.upcomingEvents.slice(0, 4).map((event: any) => (
-                <motion.div 
-                  key={event.id} 
+                <motion.div
+                  key={event.id}
                   whileHover={{ x: 4 }}
                   className="flex items-center gap-4 p-4 rounded-2xl bg-card-bg border border-border-color/60 hover:border-accent-blue/20 hover:bg-accent-blue/[0.02] transition-all shadow-sm"
                 >
@@ -248,7 +250,7 @@ export function WallCalendar() {
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 px-2">
         <p className="text-sm font-medium text-gray-text/60 italic">Tip: Click a start and end date to select a range.</p>
-        
+
         <button
           onClick={() => setIsExportModalOpen(true)}
           className="flex items-center gap-2 px-6 py-2.5 bg-accent-blue text-white rounded-xl text-xs font-black uppercase tracking-[0.2em] shadow-lg shadow-accent-blue/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-20 disabled:pointer-events-none disabled:grayscale"
@@ -261,8 +263,8 @@ export function WallCalendar() {
       </div>
 
 
-      <ExportModal 
-        isOpen={isExportModalOpen} 
+      <ExportModal
+        isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         calendar={calendar}
         notesStore={notesStore}
