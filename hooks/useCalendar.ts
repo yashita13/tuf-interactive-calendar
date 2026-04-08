@@ -83,6 +83,26 @@ export function useCalendar(initialDate: Date = new Date()) {
     type: 'click' | 'mousedown' | 'mouseenter' | 'mouseup' | 'keyboard' = 'click',
     shiftKey: boolean = false
   ) => {
+    const updateSelection = (date: Date) => {
+      setSelection(prev => {
+        // RULE: If resetting after a full range or starting fresh
+        if (!prev.start || (prev.start && prev.end)) {
+          return { start: date, end: null };
+        }
+
+        // RULE: Second tap on the SAME date (now results in 1-day range instead of null)
+        if (isSameDay(date, prev.start)) {
+          return { start: date, end: date };
+        }
+
+        // RULE: Normal range completion (auto-sorting)
+        return {
+          start: min([prev.start, date]),
+          end: max([prev.start, date])
+        };
+      });
+    };
+
     if (type === 'mousedown') {
       setIsDragging(true);
       setDragAnchor(date);
@@ -105,22 +125,10 @@ export function useCalendar(initialDate: Date = new Date()) {
         const anchor = dragAnchor;
         
         if (anchor && !isSameDay(date, anchor)) {
-          // Range Drag Finalized
+          // Range Drag Finalized (Desktop behavior)
           setSelection({
             start: min([anchor, date]),
             end: max([anchor, date])
-          });
-        } else {
-          // Single Day Click (detected via mouseup)
-          setSelection(prev => {
-            // If starting fresh or resetting after full selection
-            if (!prev.start || (prev.start && prev.end)) return { start: date, end: null };
-            // Second click logic
-            if (isSameDay(date, prev.start)) return { start: null, end: null };
-            return {
-              start: min([prev.start, date]),
-              end: max([prev.start, date])
-            };
           });
         }
         setDragAnchor(null);
@@ -144,15 +152,8 @@ export function useCalendar(initialDate: Date = new Date()) {
     }
 
     if (type === 'click') {
-      // Direct click (if mouseup didn't fire or separate handler)
-      setSelection(prev => {
-        if (!prev.start || (prev.start && prev.end)) return { start: date, end: null };
-        if (isSameDay(date, prev.start)) return { start: null, end: null };
-        return {
-          start: min([prev.start, date]),
-          end: max([prev.start, date])
-        };
-      });
+      // Direct click handles all single-tap/click selection logic
+      updateSelection(date);
       setFocusedDate(date);
     }
   }, [isDragging, dragAnchor, setSelection, setIsDragging]);
@@ -225,12 +226,15 @@ export function useCalendar(initialDate: Date = new Date()) {
       }
     }
 
+    const isPending = !!(selection.start && !selection.end);
+
     return {
       isCurrentMonth,
       isToday,
       isSelectedStart,
       isSelectedEnd,
       isSelectedRange,
+      isPending,
       isHovered,
       isDragging,
       isFocused,

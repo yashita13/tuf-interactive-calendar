@@ -17,6 +17,7 @@ type DayCellProps = {
     isHoliday: string | null;
     isWeeklyRecurrence: boolean;
     isMonthlyRecurrence: boolean;
+    isPending: boolean;
   };
   hasNotes: boolean;
   hasEvents: boolean;
@@ -26,7 +27,8 @@ type DayCellProps = {
 export function DayCell({ date, status, hasNotes, hasEvents, onClick }: DayCellProps) {
   const {
     isCurrentMonth, isToday: _isToday, isSelectedStart, isSelectedEnd,
-    isSelectedRange, isHovered, isDragging, isFocused, isWeekend, isHoliday, isWeeklyRecurrence, isMonthlyRecurrence
+    isSelectedRange, isHovered, isDragging, isFocused, isWeekend, isHoliday, 
+    isWeeklyRecurrence, isMonthlyRecurrence, isPending
   } = status;
 
   if (!isCurrentMonth) {
@@ -82,7 +84,10 @@ export function DayCell({ date, status, hasNotes, hasEvents, onClick }: DayCellP
         isSelectedRange && !isSelected && !isDragging && "bg-accent-blue/10 text-accent-blue rounded-none border-y border-accent-blue/20",
 
         // Selected Start/End (Strong Boundary - High Contrast)
-        isSelected && "bg-accent-blue text-white rounded-full shadow-[0_15px_30px_-5px_rgba(var(--accent-color-rgb),0.5)] z-10 scale-105 font-black ring-2 ring-white/20"
+        isSelected && "bg-accent-blue text-white rounded-full shadow-[0_15px_30px_-5px_rgba(var(--accent-color-rgb),0.5)] z-10 scale-105 font-black ring-2 ring-white/20",
+
+        // Pulse effect for pending state
+        isSelected && isPending && "animate-pulse ring-4 ring-accent-blue/30"
       )}
     >
       {/* Background connector for range (visual polish) */}
@@ -165,4 +170,3 @@ export function DayCell({ date, status, hasNotes, hasEvents, onClick }: DayCellP
     </motion.button>
   );
 }
-
